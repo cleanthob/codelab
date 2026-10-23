@@ -1,5 +1,9 @@
 import { cn } from "@/lib/utils";
+import "@/styles/clerk.css";
 import "@/styles/globals.css";
+import { ptBR } from "@clerk/localizations";
+import { ClerkProvider } from "@clerk/nextjs";
+import { ui } from "@clerk/ui";
 import type { Metadata } from "next";
 import { Nunito } from "next/font/google";
 
@@ -11,12 +15,22 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html
-      lang="pt-BR"
-      suppressHydrationWarning
-      className={cn("antialiased", "font-sans dark", nunito.variable)}
+    <ClerkProvider
+      localization={ptBR}
+      ui={ui}
+      appearance={{
+        variables: {
+          colorPrimary: "hsl(160 100% 37%)",
+        },
+      }}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
-    </html>
+      <html
+        lang="pt-BR"
+        suppressHydrationWarning
+        className={cn("antialiased", "font-sans dark", nunito.variable)}
+      >
+        <body className="min-h-full flex flex-col">{children}</body>
+      </html>
+    </ClerkProvider>
   );
 }
