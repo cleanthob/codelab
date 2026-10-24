@@ -5,6 +5,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { useUser } from "@clerk/nextjs";
 import {
   BookOpen,
   BookUp2,
@@ -23,6 +24,10 @@ type NavItem = {
 };
 
 export const NavItems = () => {
+  const { user } = useUser();
+
+  const isAdmin = user?.publicMetadata?.role === "admin";
+
   const navItems: NavItem[] = [
     { label: "Cursos", path: "/", icon: SquareDashedBottomCode },
     { label: "Meus cursos", path: "/my-courses", icon: BookUp2 },
@@ -64,10 +69,13 @@ export const NavItems = () => {
     <SidebarGroup>
       <SidebarMenu>
         {renderNavItems(navItems)}
-
-        <Separator className="my-2" />
-
-        {renderNavItems(adminNavItems)}
+        {isAdmin && (
+          <>
+            {" "}
+            <Separator className="my-2" />
+            {renderNavItems(adminNavItems)}
+          </>
+        )}
       </SidebarMenu>
     </SidebarGroup>
   );
