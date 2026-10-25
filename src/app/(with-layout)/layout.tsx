@@ -1,5 +1,5 @@
 "use client";
-
+import { Suspense } from "react";
 import { AppSidebar } from "@/components/shared/app-sidebar";
 import { SearchInput } from "@/components/shared/search-input";
 import { Button } from "@/components/ui/button";
@@ -28,7 +28,13 @@ export default function Layout({ children }: LayoutProps) {
           <header className="flex h-[70px] shrink-0 border-b items-center px-6 justify-between gap-2">
             <div className="flex-1 flex items-center gap-4">
               <SidebarTrigger className="flex md:hidden -ml-1" />
-              <SearchInput />
+              <Suspense
+                fallback={
+                  <div className="h-9 max-w-[400px] flex-1 animate-pulse rounded-md bg-muted" />
+                }
+              >
+                <SearchInput />
+              </Suspense>
             </div>
 
             {isLoaded && !isSignedIn && (

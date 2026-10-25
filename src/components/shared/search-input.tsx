@@ -2,21 +2,61 @@
 
 import { Search } from "lucide-react";
 import { Input } from "../ui/input";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useDebounce } from "@/hooks/use-debounce";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import queryString from "query-string";
 
 export const SearchInput = () => {
   const [value, setValue] = useState("");
 
+  const debouncedValue = useDebounce(value);
+
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const currentQuery = searchParams.get("query") ?? "";
+  const currentTags = searchParams.getAll("tags");
+
+  useEffect(() => {
+    if (currentQuery === debouncedValue) return;
+
+    const params = queryString.stringify(
+      {
+        tags: currentTags,
+        query: debouncedValue,
+      },
+      {
+        skipEmptyString: true,
+        skipNull: true,
+        arrayFormat: "none",
+      },
+    );
+
+    const url = params ? `${pathname}?${params}` : pathname;
+
+    router.push(url);
+  }, [
+    currentQuery,
+    debouncedValue,
+    pathname,
+    router,
+    searchParams,
+    currentTags.join(","),
+  ]);
+
   return (
-    <div className="flex-1 max-w-[400px] relative">
+    <div className="relative max-w-[400px] flex-1">
       <Input
-        className="h-9 pl-9 peer"
+        className="peer h-9 pl-9"
         placeholder="Buscar um curso"
         value={value}
-        onChange={({ target }) => setValue(target.value)}
+        onChange={(event) => setValue(event.target.value)}
       />
+
       <Search
-        className="absolute top-1/2 -translate-y-1/2 left-3 text-muted-foreground peer-focus:text-primary transition-all"
+        className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground transition-all peer-focus:text-primary"
         size={16}
       />
     </div>
