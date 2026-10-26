@@ -43,3 +43,29 @@ export const getCourses = async ({
 
   return courses;
 };
+
+export const getCourse = async (
+  query: string,
+  queryType: "slug" | "id" = "slug",
+) => {
+  const course = await prisma.course.findUnique({
+    where: queryType === "slug" ? { slug: query } : { id: query },
+    include: {
+      modules: {
+        include: {
+          lessons: {
+            orderBy: {
+              order: "asc",
+            },
+          },
+        },
+        orderBy: {
+          order: "asc",
+        },
+      },
+      tags: true,
+    },
+  });
+
+  return { course };
+};
