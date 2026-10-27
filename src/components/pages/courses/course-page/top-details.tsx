@@ -2,6 +2,7 @@
 
 import { BackButton } from "@/components/ui/back-button";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import { Course } from "@/generated/prisma/client";
 import { usePreferencesStore } from "@/stores/preferences";
 import { PanelRightOpen } from "lucide-react";
@@ -12,7 +13,8 @@ type TopDetailsProps = {
 };
 
 export const TopDetails = ({ course }: TopDetailsProps) => {
-  const { setModulesListCollapsed } = usePreferencesStore();
+  const { autoplay, setAutoplay, setModulesListCollapsed } =
+    usePreferencesStore();
   return (
     <div className="w-full flex items-center gap-4 sm:gap-6 p-4 border-b border-border bg-sidebar sticky top-0 z-10">
       <BackButton />
@@ -32,6 +34,11 @@ export const TopDetails = ({ course }: TopDetailsProps) => {
       </div>
 
       <div className="ml-auto flex items-center gap-4">
+        <Switch
+          checked={autoplay}
+          onCheckedChange={(checked) => setAutoplay(checked)}
+        />
+
         <Button
           size="icon"
           variant="outline"
