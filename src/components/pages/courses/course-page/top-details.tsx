@@ -1,5 +1,10 @@
+"use client";
+
 import { BackButton } from "@/components/ui/back-button";
+import { Button } from "@/components/ui/button";
 import { Course } from "@/generated/prisma/client";
+import { usePreferencesStore } from "@/stores/preferences";
+import { PanelRightOpen } from "lucide-react";
 import Link from "next/link";
 
 type TopDetailsProps = {
@@ -7,6 +12,7 @@ type TopDetailsProps = {
 };
 
 export const TopDetails = ({ course }: TopDetailsProps) => {
+  const { setModulesListCollapsed } = usePreferencesStore();
   return (
     <div className="w-full flex items-center gap-4 sm:gap-6 p-4 border-b border-border bg-sidebar sticky top-0 z-10">
       <BackButton />
@@ -25,7 +31,16 @@ export const TopDetails = ({ course }: TopDetailsProps) => {
         <p className="line-clamp-1">Título da aula</p>
       </div>
 
-      <div className="ml-auto flex items-center gap-4"></div>
+      <div className="ml-auto flex items-center gap-4">
+        <Button
+          size="icon"
+          variant="outline"
+          onClick={() => setModulesListCollapsed(false)}
+          className="flex sm:hidden"
+        >
+          <PanelRightOpen />
+        </Button>
+      </div>
     </div>
   );
 };
