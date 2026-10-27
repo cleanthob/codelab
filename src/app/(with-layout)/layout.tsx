@@ -1,5 +1,4 @@
 "use client";
-import { Suspense } from "react";
 import { AppSidebar } from "@/components/shared/app-sidebar";
 import { SearchInput } from "@/components/shared/search-input";
 import { Button } from "@/components/ui/button";
@@ -9,9 +8,11 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { useUser } from "@clerk/nextjs";
+import { cn } from "cn";
 import { LogIn } from "lucide-react";
 import Link from "next/link";
-import { ReactNode } from "react";
+import { usePathname } from "next/navigation";
+import { ReactNode, Suspense } from "react";
 
 type LayoutProps = {
   children: ReactNode;
@@ -20,21 +21,30 @@ type LayoutProps = {
 export default function Layout({ children }: LayoutProps) {
   const { isSignedIn, isLoaded } = useUser();
 
+  const pathname = usePathname();
+
+  const isHomePage = pathname === "/";
+
+  const isCoursePage = /^\/courses\/(?!details\/).*/.test(pathname);
+
   return (
     <>
       <SidebarProvider>
         <AppSidebar />
         <SidebarInset>
-          <header className="flex h-[70px] shrink-0 border-b items-center px-6 justify-between gap-2">
+          <header
+            className={cn(
+              "flex h-[70px] shrink-0 border-b items-center px-6 justify-between gap-2",
+              !isHomePage && "md:hidden",
+            )}
+          >
             <div className="flex-1 flex items-center gap-4">
               <SidebarTrigger className="flex md:hidden -ml-1" />
-              <Suspense
-                fallback={
-                  <div className="h-9 max-w-[400px] flex-1 animate-pulse rounded-md bg-muted" />
-                }
-              >
-                <SearchInput />
-              </Suspense>
+              {isHomePage && (
+                <Suspense>
+                  <SearchInput />
+                </Suspense>
+              )}
             </div>
 
             {isLoaded && !isSignedIn && (
@@ -47,7 +57,12 @@ export default function Layout({ children }: LayoutProps) {
             )}
           </header>
 
-          <div className="flex flex-1 flex-col gap-6 p-6 overflow-auto">
+          <div
+            className={cn(
+              "flex flex-1 flex-col gap-6 p-6 overflow-auto",
+              isCoursePage && "p-0",
+            )}
+          >
             {children}
           </div>
         </SidebarInset>
