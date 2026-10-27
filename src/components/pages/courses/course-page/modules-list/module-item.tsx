@@ -26,7 +26,7 @@ export const ModuleItem = ({ data }: ModuleItemProps) => {
       value={data.id}
       className="border border-border rounded-lg group"
     >
-      <Accordion.Trigger className="flex items-center gap-4 p-4 w-full hover:bg-muted/50 transition-all">
+      <Accordion.Trigger className="flex items-center gap-4 p-4 w-full hover:bg-muted/50 transition-all outline-none">
         <div
           className={cn(
             "w-10 h-10 min-w-10 rounded-full flex items-center",
@@ -53,7 +53,7 @@ export const ModuleItem = ({ data }: ModuleItemProps) => {
 
         <ChevronDown className="ml-auto text-muted-foreground w-4 h-4 group-data-[state=open]:rotate-180 transition-all" />
       </Accordion.Trigger>
-      <Accordion.Content>
+      <Accordion.Content className="data-[state=closed]:animate-slideUp data-[state=open]:animate-slideDown overflow-hidden">
         <div className="p-2 flex flex-col">
           {data.lessons.map((lesson: CourseLesson) => (
             <LessonItem key={lesson.id} lesson={lesson} />
