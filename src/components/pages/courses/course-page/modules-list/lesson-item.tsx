@@ -1,7 +1,12 @@
-import { markLessonsAsCompleted } from "@/actions/course-progress";
+import {
+  markLessonsAsCompleted,
+  unkmarkLessonAsCompleted,
+} from "@/actions/course-progress";
 import { Tooltip } from "@/components/ui/tooltip";
+import { useRouter } from "next/navigation";
+import { queryKeys } from "@/constants/query-keys";
 import { formatDuration } from "@/lib/utils";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { cn } from "cn";
 import { CircleCheckBig, CircleX, Video } from "lucide-react";
 import Link from "next/link";
@@ -12,7 +17,9 @@ type LessonItemProps = {
 };
 
 export const LessonItem = ({ lesson }: LessonItemProps) => {
+  const router = useRouter();
   const params = useParams();
+  const queryClient = useQueryClient();
 
   const courseSlug = params.slug as string;
   const lessonId = lesson.id;
@@ -25,9 +32,39 @@ export const LessonItem = ({ lesson }: LessonItemProps) => {
   const { mutate: handleCompleteLesson, isPending: isCompletingLesson } =
     useMutation({
       mutationFn: () => markLessonsAsCompleted({ lessonId, courseSlug }),
+      onSuccess: async () => {
+        await queryClient.invalidateQueries({
+          queryKey: queryKeys.courseProgress(courseSlug),
+          exact: true,
+        });
+
+        router.refresh();
+      },
     });
 
-  const isLoading = isCompletingLesson;
+  const {
+    mutate: handleUnmarkLessonAsCompleted,
+    isPending: isUnmarkingLesson,
+  } = useMutation({
+    mutationFn: () => unkmarkLessonAsCompleted(lessonId),
+
+    onSuccess: async () => {
+      console.log("Aula desmarcada:", lessonId);
+
+      await queryClient.invalidateQueries({
+        queryKey: queryKeys.courseProgress(courseSlug),
+        exact: true,
+      });
+
+      console.log("Query invalidada");
+    },
+
+    onError: (error) => {
+      console.error("Erro ao desmarcar aula:", error);
+    },
+  });
+
+  const isLoading = isCompletingLesson || isUnmarkingLesson;
 
   return (
     <Link
@@ -36,7 +73,7 @@ export const LessonItem = ({ lesson }: LessonItemProps) => {
         lesson.id === currentLessonId && "text-white",
         completed && "text-primary",
       )}
-      href={`/courses/course-slug/module-id/lesson/${lesson.id}`}
+      href={`/courses/${courseSlug}/module-id/lesson/${lesson.id}`}
     >
       <Tooltip
         content={
@@ -52,10 +89,10 @@ export const LessonItem = ({ lesson }: LessonItemProps) => {
             event.stopPropagation();
 
             if (completed) {
-              return;
+              handleUnmarkLessonAsCompleted();
+            } else {
+              handleCompleteLesson();
             }
-
-            handleCompleteLesson();
           }}
         >
           <PrimaryIcon className="w-full h-full opacity-100 transition-all group-hover/lesson-button:opacity-0" />

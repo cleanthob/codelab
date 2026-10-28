@@ -22,14 +22,11 @@ export const ModuleItem = ({ data, completedLessons }: ModuleItemProps) => {
   const formattedDuration = formatDuration(totalDuration);
 
   const lessons = useMemo(() => {
-    return data.lessons.map((lesson: CourseLesson) => {
-      const completed = completedLessons.some(
-        (completedLesson) => completedLesson.lessonId === lesson.id,
-      );
-
-      return { ...lesson, completed };
-    });
-  }, []);
+    return data.lessons.map((lesson: CourseLesson) => ({
+      ...lesson,
+      completed: completedLessons.some((item) => item.lessonId === lesson.id),
+    }));
+  }, [data.lessons, completedLessons]);
 
   const moduleProgress = 100;
 

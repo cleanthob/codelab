@@ -46,7 +46,12 @@ export const ModulesList = ({ modules }: ModulesListProps) => {
     queryKey: queryKeys.courseProgress(courseSlug),
     queryFn: () => getCourseProgress(courseSlug),
     enabled: !!courseSlug,
+    staleTime: 0,
   });
+
+  useEffect(() => {
+    console.log("Progresso atualizado:", courseProgress?.completedLessons);
+  }, [courseProgress]);
 
   const completedLessons = courseProgress?.completedLessons ?? [];
 

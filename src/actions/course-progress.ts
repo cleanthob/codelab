@@ -39,6 +39,25 @@ export const markLessonsAsCompleted = async ({
   return completedLesson;
 };
 
+export const unkmarkLessonAsCompleted = async (lessonId: string) => {
+  const { userId } = await getUser();
+
+  const completedLesson = await prisma.completedLesson.findFirst({
+    where: {
+      lessonId,
+      userId,
+    },
+  });
+
+  if (!completedLesson) {
+    return;
+  }
+
+  await prisma.completedLesson.delete({
+    where: { id: completedLesson.id },
+  });
+};
+
 export const getCourseProgress = async (courseSlug: string) => {
   const { userId } = await getUser();
 
