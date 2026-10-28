@@ -3,6 +3,7 @@
 import { BackButton } from "@/components/ui/back-button";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import { Tooltip } from "@/components/ui/tooltip";
 import { Course } from "@/generated/prisma/client";
 import { usePreferencesStore } from "@/stores/preferences";
 import { PanelRightOpen } from "lucide-react";
@@ -34,10 +35,15 @@ export const TopDetails = ({ course }: TopDetailsProps) => {
       </div>
 
       <div className="ml-auto flex items-center gap-4">
-        <Switch
-          checked={autoplay}
-          onCheckedChange={(checked) => setAutoplay(checked)}
-        />
+        <Tooltip content="Ativar autoplay">
+          <div className="flex items-center gap-2">
+            <span className="text-xs block sm:hidden">Autoplay</span>
+            <Switch
+              checked={autoplay}
+              onCheckedChange={(checked) => setAutoplay(checked)}
+            />
+          </div>
+        </Tooltip>
 
         <Button
           size="icon"

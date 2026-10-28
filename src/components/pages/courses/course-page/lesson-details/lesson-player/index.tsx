@@ -12,8 +12,10 @@ type LessonPlayerProps = {
 export const LessonPlayer = ({ lesson }: LessonPlayerProps) => {
   const autoplay = usePreferencesStore((state) => state.autoplay);
 
+  const videoId = lesson.videoId;
+
   return (
-    <div className="overflow-hidden w-full aspect-video bg-black">
+    <div key={videoId} className="overflow-hidden w-full aspect-video bg-black">
       <VideoPlayer videoId={lesson.videoId} autoplay={autoplay} />
     </div>
   );

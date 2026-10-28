@@ -13,6 +13,7 @@ type ModulesListProps = {
 };
 
 export const ModulesList = ({ modules }: ModulesListProps) => {
+  const moduleId = modules[0].id;
   const {
     expandedModule,
     setExpandedModule,
@@ -85,6 +86,7 @@ export const ModulesList = ({ modules }: ModulesListProps) => {
             onValueChange={setExpandedModule}
             className="flex h-full w-full flex-col gap-3"
             collapsible
+            defaultValue={moduleId}
           >
             {modules.map((courseModule) => (
               <ModuleItem key={courseModule.id} data={courseModule} />
