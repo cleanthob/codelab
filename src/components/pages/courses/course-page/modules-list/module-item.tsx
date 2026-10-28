@@ -28,7 +28,13 @@ export const ModuleItem = ({ data, completedLessons }: ModuleItemProps) => {
     }));
   }, [data.lessons, completedLessons]);
 
-  const moduleProgress = 100;
+  const moduleProgress = useMemo(() => {
+    const completedModuleLessons = lessons.filter(
+      (lesson: CourseLesson) => lesson.completed,
+    ).length;
+
+    return (completedModuleLessons / totalLessons) * 100;
+  }, [lessons, totalLessons]);
 
   return (
     <Accordion.Item
