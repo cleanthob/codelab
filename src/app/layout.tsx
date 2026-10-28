@@ -1,3 +1,4 @@
+import { ClientProviders } from "@/components/shared/client-providers";
 import { cn } from "@/lib/utils";
 import "@/styles/clerk.css";
 import "@/styles/globals.css";
@@ -29,7 +30,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         suppressHydrationWarning
         className={cn("antialiased", "font-sans dark", nunito.variable)}
       >
-        <body className="min-h-full flex flex-col">{children}</body>
+        <body className="min-h-full flex flex-col">
+          <ClientProviders>{children}</ClientProviders>
+        </body>
       </html>
     </ClerkProvider>
   );
