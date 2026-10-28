@@ -1,19 +1,33 @@
+import { markLessonsAsCompleted } from "@/actions/course-progress";
 import { Tooltip } from "@/components/ui/tooltip";
 import { formatDuration } from "@/lib/utils";
+import { useMutation } from "@tanstack/react-query";
 import { cn } from "cn";
 import { CircleCheckBig, CircleX, Video } from "lucide-react";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 
 type LessonItemProps = {
-  lesson: CourseLesson;
+  lesson: CourseLesson & { completed: boolean };
 };
 
 export const LessonItem = ({ lesson }: LessonItemProps) => {
+  const params = useParams();
+
+  const courseSlug = params.slug as string;
+  const lessonId = lesson.id;
   const currentLessonId = "cmvmqwxde00377kvkar0pbb30";
-  const completed = false;
+  const completed = lesson.completed;
 
   const PrimaryIcon = completed ? CircleCheckBig : Video;
   const SecondaryIcon = completed ? CircleX : CircleCheckBig;
+
+  const { mutate: handleCompleteLesson, isPending: isCompletingLesson } =
+    useMutation({
+      mutationFn: () => markLessonsAsCompleted({ lessonId, courseSlug }),
+    });
+
+  const isLoading = isCompletingLesson;
 
   return (
     <Link
@@ -31,7 +45,18 @@ export const LessonItem = ({ lesson }: LessonItemProps) => {
       >
         <button
           type="button"
-          className="w-4 min-w-4 h-4 relative group/lesson-button"
+          className="w-4 min-w-4 h-4 relative group/lesson-button disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={isLoading}
+          onClick={(event) => {
+            event.preventDefault();
+            event.stopPropagation();
+
+            if (completed) {
+              return;
+            }
+
+            handleCompleteLesson();
+          }}
         >
           <PrimaryIcon className="w-full h-full opacity-100 transition-all group-hover/lesson-button:opacity-0" />
           <SecondaryIcon className="absolute inset-0 w-full h-full opacity-0 transition-all group-hover/lesson-button:opacity-100" />
