@@ -8,14 +8,27 @@ import { Course } from "@/generated/prisma/client";
 import { usePreferencesStore } from "@/stores/preferences";
 import { PanelRightOpen } from "lucide-react";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 
 type TopDetailsProps = {
-  course: Course;
+  course: CourseModuleWithLessons;
 };
 
 export const TopDetails = ({ course }: TopDetailsProps) => {
+  const params = useParams();
   const { autoplay, setAutoplay, setModulesListCollapsed } =
     usePreferencesStore();
+
+  const moduleId = params.moduleId as string;
+  const lessonId = params.lessonId as string;
+
+  const currentModule = course.modules.find(
+    (mod: CourseModule) => mod.id === moduleId,
+  );
+  const currentLesson = currentModule?.lessons?.find(
+    (lesson: CourseLesson) => lesson.id === lessonId,
+  );
+
   return (
     <div className="w-full flex items-center gap-4 sm:gap-6 p-4 border-b border-border bg-sidebar sticky top-0 z-10">
       <BackButton />
@@ -29,9 +42,9 @@ export const TopDetails = ({ course }: TopDetailsProps) => {
         </Link>
 
         <span className="text-muted-foreground">/</span>
-        <p className="hidden sm:block line-clamp-1">Título do módulo</p>
+        <p className="hidden sm:block line-clamp-1">{currentModule?.title}</p>
         <span className="text-muted-foreground hidden sm:block">/</span>
-        <p className="line-clamp-1">Título da aula</p>
+        <p className="line-clamp-1">{currentLesson?.title}</p>
       </div>
 
       <div className="ml-auto flex items-center gap-4">
