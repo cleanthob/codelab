@@ -17,9 +17,10 @@ import {
 type VideoPlayerProps = {
   videoId: string;
   autoplay: boolean;
+  onEnd?: () => void;
 };
 
-const VideoPlayer = ({ videoId, autoplay }: VideoPlayerProps) => {
+const VideoPlayer = ({ videoId, autoplay, onEnd }: VideoPlayerProps) => {
   const player = useRef<MediaPlayerInstance>(null);
   const started = useRef(false);
 
@@ -42,6 +43,7 @@ const VideoPlayer = ({ videoId, autoplay }: VideoPlayerProps) => {
       title="Vídeo da aula"
       src={`youtube/${videoId}`}
       autoPlay={false}
+      onEnd={onEnd}
       muted={autoplay}
       onCanPlay={handleCanPlay}
     >
