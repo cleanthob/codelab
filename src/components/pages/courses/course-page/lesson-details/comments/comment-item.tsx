@@ -12,9 +12,17 @@ import { CommentInput } from "./comment-input";
 
 type CommentItemProps = {
   comment: LessonCommentWithUserAndReplies;
+  className?: string;
+  parentCommentId?: string;
+  canReply?: boolean;
 };
 
-export const CommentItem = ({ comment }: CommentItemProps) => {
+export const CommentItem = ({
+  comment,
+  className,
+  parentCommentId,
+  canReply = true,
+}: CommentItemProps) => {
   const user = comment.user;
 
   const authorName = formatName(user.firstName, user.lastName);
@@ -38,13 +46,20 @@ export const CommentItem = ({ comment }: CommentItemProps) => {
       onClick: () => {
         setIsReplying(true);
       },
-      hidden: false,
+      hidden: !canReply,
       disabled: false,
     },
   ];
 
+  const replies = comment?.replies ?? [];
+
   return (
-    <div className={cn("p-4 rounded-lg bg-card flex flex-col gap-3 text-sm")}>
+    <div
+      className={cn(
+        "p-4 rounded-lg bg-card flex flex-col gap-3 text-sm",
+        className,
+      )}
+    >
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-2">
           <Avatar src={user.imageUrl} fallback={authorName} />
@@ -79,9 +94,23 @@ export const CommentItem = ({ comment }: CommentItemProps) => {
 
       <p className="text-muted-foreground">{comment.content}</p>
 
+      {!!replies.length && (
+        <div className="pl-4 flex flex-col gap-2">
+          {replies.map((reply, index) => (
+            <CommentItem
+              key={reply.id}
+              comment={reply}
+              parentCommentId={comment.id}
+              className="bg-muted p-3"
+              canReply={index === replies.length - 1}
+            />
+          ))}
+        </div>
+      )}
+
       {isReplying && (
         <CommentInput
-          parentCommentId={comment.id}
+          parentCommentId={parentCommentId ?? comment.id}
           autoFocus
           onCancel={() => setIsReplying(false)}
           onSuccess={() => setIsReplying(false)}
