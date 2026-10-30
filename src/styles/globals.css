@@ -121,6 +121,18 @@
     scrollbar-width: none;
   }
 
+  ::-webkit-scrollbar {
+    @apply w-1.5;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-background;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-muted-foreground/20 rounded-full;
+  }
+
   .scroll-hidden::-webkit-scrollbar {
     display: none;
   }
