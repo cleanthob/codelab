@@ -1,8 +1,10 @@
-type Course = import("@/generated/prisma").Course;
-type CourseTag = import("@/generated/prisma").CourseTag;
-type CourseModule = import("@/generated/prisma").CourseModule;
-type CourseLesson = import("@/generated/prisma").CourseLesson;
-type CompletedLesson = import("@/generated/prisma").CompletedLesson;
+type Course = import("@/generated/prisma/client").Course;
+type CourseTag = import("@/generated/prisma/client").CourseTag;
+type CourseModule = import("@/generated/prisma/client").CourseModule;
+type CourseLesson = import("@/generated/prisma/client").CourseLesson;
+type CompletedLesson = import("@/generated/prisma/client").CompletedLesson;
+type LessonComment = import("@/generated/prisma/client").LessonComment;
+type User = import("@/generated/prisma/client").User;
 
 type CourseWithTagsAndModules = Course & {
   tags: CourseTag[];
@@ -15,4 +17,9 @@ type CourseModuleWithLessons = CourseModule & {
 
 type CourseWithModulesAndLessons = Course & {
   modules: CourseModuleWithLessons[];
+};
+
+type LessonCommentWithUserAndReplies = LessonComment & {
+  user: User;
+  replies?: LessonCommentWithUserAndReplies[];
 };

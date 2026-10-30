@@ -10,6 +10,18 @@ type CreateLessonCommentPayload = {
   parentId?: string;
 };
 
+export const getLessonComments = async (lessonId: string) => {
+  await getUser();
+
+  const comments = await prisma.lessonComment.findMany({
+    where: { lessonId, parentId: null },
+    include: { user: true, parent: true, replies: { include: { user: true } } },
+    orderBy: { createdAt: "asc" },
+  });
+
+  return comments;
+};
+
 export const createLessonComment = async ({
   content,
   courseSlug,

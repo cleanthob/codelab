@@ -7,6 +7,10 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { ui } from "@clerk/ui";
 import type { Metadata } from "next";
 import { Nunito } from "next/font/google";
+import { setDefaultOptions } from "date-fns";
+import { ptBR as dateFnsPtBR } from "date-fns/locale";
+
+setDefaultOptions({ locale: dateFnsPtBR });
 
 const nunito = Nunito({ subsets: ["latin"], variable: "--font-sans" });
 

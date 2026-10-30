@@ -35,3 +35,9 @@ export const formatPrice = (price: number) => {
     currency: "BRL",
   }).format(price);
 };
+
+export const formatName = (firstName: string, lastName?: string | null) => {
+  if (!lastName) return firstName;
+
+  return `${firstName} ${lastName}`;
+};
