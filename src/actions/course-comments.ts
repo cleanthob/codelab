@@ -1,6 +1,8 @@
 "use server";
 
+import { checkRole } from "@/lib/clerk";
 import { prisma } from "@/lib/prisma";
+import { auth } from "@clerk/nextjs/server";
 import { getUser } from "./user";
 
 type CreateLessonCommentPayload = {
@@ -57,4 +59,27 @@ export const createLessonComment = async ({
   });
 
   return comment;
+};
+
+export const deleteComment = async (commentId: string) => {
+  const { sessionClaims } = await auth();
+  const { userId } = await getUser();
+
+  const isAdmin = checkRole(sessionClaims, "admin");
+
+  const comment = await prisma.lessonComment.findUnique({
+    where: { id: commentId },
+  });
+
+  if (!comment) {
+    throw new Error("Comentário não encontrado");
+  }
+
+  if (!isAdmin && comment.userId !== userId) {
+    throw new Error("Você não tem permissão para deletar esse comentário");
+  }
+
+  await prisma.lessonComment.delete({
+    where: { id: commentId },
+  });
 };

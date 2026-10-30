@@ -9,6 +9,11 @@ import { formatDistanceToNow } from "date-fns";
 import { MessageSquareQuote, Trash } from "lucide-react";
 import { useState } from "react";
 import { CommentInput } from "./comment-input";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { deleteComment } from "@/actions/course-comments";
+import { queryKeys } from "@/constants/query-keys";
+import { toast } from "sonner";
+import { useUser } from "@clerk/nextjs";
 
 type CommentItemProps = {
   comment: LessonCommentWithUserAndReplies;
@@ -23,6 +28,9 @@ export const CommentItem = ({
   parentCommentId,
   canReply = true,
 }: CommentItemProps) => {
+  const queryClient = useQueryClient();
+  const { user: currentUser } = useUser();
+  const isAdmin = currentUser?.publicMetadata?.role === "admin";
   const user = comment.user;
 
   const authorName = formatName(user.firstName, user.lastName);
@@ -32,13 +40,30 @@ export const CommentItem = ({
 
   const [isReplying, setIsReplying] = useState(false);
 
+  const { mutate: handleDeleteComment, isPending: isDeleting } = useMutation({
+    mutationFn: () => deleteComment(comment.id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.lessonComments(comment.lessonId),
+      });
+      toast.success("Comentário deletado com sucesso!");
+    },
+    onError: () => {
+      toast.success("Erro ao deletar comentário!");
+    },
+  });
+
+  const canDelete = comment?.user?.clerkUserId === currentUser?.id || isAdmin;
+
   const actions = [
     {
       label: "Deletar",
       icon: Trash,
-      onClick: () => {},
-      hidden: false,
-      disabled: false,
+      onClick: () => {
+        handleDeleteComment();
+      },
+      hidden: !canDelete,
+      disabled: isDeleting,
     },
     {
       label: "Responder",
@@ -47,7 +72,6 @@ export const CommentItem = ({
         setIsReplying(true);
       },
       hidden: !canReply,
-      disabled: false,
     },
   ];
 
