@@ -82,7 +82,9 @@ export const CheckoutDialog = ({
             </div>
           )}
 
-          {step === 2 && paymentMethod === "CREDIT_CARD" && <CreditCardForm />}
+          {step === 2 && paymentMethod === "CREDIT_CARD" && (
+            <CreditCardForm onBack={() => setStep(1)} />
+          )}
 
           {step === 2 && paymentMethod === "PIX" && <PixForm />}
         </div>

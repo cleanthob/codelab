@@ -14,7 +14,11 @@ import Cards from "react-credit-cards-2";
 
 type FormData = z.infer<typeof creditCardCheckoutFormSchema>;
 
-export const CreditCardForm = () => {
+type CreditCardFormProps = {
+  onBack: () => void;
+};
+
+export const CreditCardForm = ({ onBack }: CreditCardFormProps) => {
   const form = useForm<FormData>({
     resolver: zodResolver(creditCardCheckoutFormSchema),
     mode: "onSubmit",
@@ -105,7 +109,7 @@ export const CreditCardForm = () => {
         </div>
 
         <div className="flex items-center justify-between mt-6">
-          <Button variant="outline">
+          <Button variant="outline" type="button" onClick={onBack}>
             <ArrowLeft />
             Voltar
           </Button>
