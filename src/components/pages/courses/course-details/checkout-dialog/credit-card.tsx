@@ -65,11 +65,9 @@ export const CreditCardForm = ({ onBack }: CreditCardFormProps) => {
           </div>
 
           <div className="w-full grid sm:grid-cols-2 gap-2 flex-1">
-            <InputField
-              name="name"
-              placeholder="Nome impresso no cartão"
-              className="col-span-full"
-            />
+            <div className="col-span-full">
+              <InputField name="name" placeholder="Nome impresso no cartão" />
+            </div>
             <InputField
               name="cpf"
               placeholder="CPF do titular"
