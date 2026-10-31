@@ -7,6 +7,8 @@ import { cn } from "cn";
 import PixIcon from "@/assets/pix.svg";
 import { ArrowRight, CreditCard } from "lucide-react";
 import { useState } from "react";
+import { CreditCardForm } from "./credit-card";
+import { PixForm } from "./pix";
 
 type CheckoutDialogProps = {
   open: boolean;
@@ -38,7 +40,9 @@ export const CheckoutDialog = ({
     "PIX",
   );
 
-  const handleContinue = () => {};
+  const handleContinue = () => {
+    setStep(2);
+  };
 
   return (
     <Dialog
@@ -76,6 +80,10 @@ export const CheckoutDialog = ({
               </Button>
             </div>
           )}
+
+          {step === 2 && paymentMethod === "CREDIT_CARD" && <CreditCardForm />}
+
+          {step === 2 && paymentMethod === "PIX" && <PixForm />}
         </div>
       }
     />
