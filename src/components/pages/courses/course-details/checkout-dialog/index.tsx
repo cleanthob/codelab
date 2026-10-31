@@ -7,6 +7,7 @@ import { cn } from "cn";
 import PixIcon from "@/assets/pix.svg";
 import { ArrowRight, CreditCard } from "lucide-react";
 import { useState } from "react";
+import "react-credit-cards-2/dist/es/styles-compiled.css";
 import { CreditCardForm } from "./credit-card";
 import { PixForm } from "./pix";
 

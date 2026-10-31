@@ -139,3 +139,7 @@
     display: none;
   }
 }
+
+.rccs__card--unknown > div {
+  background: var(--primary) !important;
+}

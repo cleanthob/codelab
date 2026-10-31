@@ -10,6 +10,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import Cards from "react-credit-cards-2";
 
 type FormData = z.infer<typeof creditCardCheckoutFormSchema>;
 
@@ -31,7 +32,9 @@ export const CreditCardForm = () => {
     },
   });
 
-  const { handleSubmit } = form;
+  const { handleSubmit, watch } = form;
+
+  const formValues = watch();
 
   const onSubmit = (data: FormData) => {
     console.log(data);
@@ -47,7 +50,14 @@ export const CreditCardForm = () => {
       <form className="flex flex-col" onSubmit={handleSubmit(onSubmit)}>
         <div className="flex items-center gap-4 flex-col">
           <div>
-            <p>PREVIEW DO CARTÃO DE CRÉDITO</p>
+            <Cards
+              number={formValues.cardNumber}
+              expiry={formValues.cardValidThru}
+              cvc={formValues.cardCvv}
+              name={formValues.name}
+              placeholders={{ name: "NOME COMPLETO" }}
+              locale={{ valid: "Válido até" }}
+            />
           </div>
 
           <div className="w-full grid sm:grid-cols-2 gap-2 flex-1">
