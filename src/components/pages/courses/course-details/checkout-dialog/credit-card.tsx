@@ -70,7 +70,11 @@ export const CreditCardForm = ({ onBack }: CreditCardFormProps) => {
               placeholder="Nome impresso no cartão"
               className="col-span-full"
             />
-            <InputField name="cpf" placeholder="CPF do titular" />
+            <InputField
+              name="cpf"
+              placeholder="CPF do titular"
+              mask="___.___.___-__"
+            />
             <FormField name="phone">
               {({ field }) => (
                 <Input
@@ -85,9 +89,17 @@ export const CreditCardForm = ({ onBack }: CreditCardFormProps) => {
             </FormField>
             <Separator className="col-span-full my-1 sm:my-2" />
 
-            <InputField name="cardNumber" placeholder="Número do cartão" />
-            <InputField name="cardValidThru" placeholder="Validade" />
-            <InputField name="cardCvv" placeholder="CVV" />
+            <InputField
+              name="cardNumber"
+              placeholder="Número do cartão"
+              mask="____ ____ ____ ____"
+            />
+            <InputField
+              name="cardValidThru"
+              placeholder="Validade"
+              mask="__/__"
+            />
+            <InputField name="cardCvv" placeholder="CVV" mask="___" />
 
             <FormField name="installments">
               {({ field }) => (
@@ -103,7 +115,11 @@ export const CreditCardForm = ({ onBack }: CreditCardFormProps) => {
             <div className="col-span-full grid sm:grid-cols-[1.4fr]_1fr_1fr gap-2">
               <InputField name="address" placeholder="Endereço (opcional)" />
               <InputField name="addressNumber" placeholder="Número" />
-              <InputField name="postalCode" placeholder="CEP" />
+              <InputField
+                name="postalCode"
+                placeholder="CEP"
+                mask="_____-___"
+              />
             </div>
           </div>
         </div>

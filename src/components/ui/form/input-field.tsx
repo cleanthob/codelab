@@ -1,14 +1,34 @@
 import { ComponentProps } from "react";
 import { Input } from "../input";
 import { FormField } from "./field";
+import { InputMask } from "@react-input/mask";
 
 type InputFieldProps = ComponentProps<typeof FormField> &
-  ComponentProps<typeof Input>;
+  ComponentProps<typeof Input> & {
+    mask?: string;
+  };
 
-export const InputField = ({ name, className, ...props }: InputFieldProps) => {
+export const InputField = ({
+  name,
+  className,
+  mask,
+  ...props
+}: InputFieldProps) => {
   return (
     <FormField name={name} className={className} {...props}>
-      {({ field }) => <Input {...field} {...props} />}
+      {({ field }) =>
+        mask ? (
+          <InputMask
+            mask={mask}
+            component={Input}
+            replacement={{ _: /\d/ }}
+            {...field}
+            {...props}
+          />
+        ) : (
+          <Input {...field} {...props} />
+        )
+      }
     </FormField>
   );
 };
