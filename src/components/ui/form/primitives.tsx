@@ -4,8 +4,8 @@ import * as React from "react";
 import {
   Controller,
   FormProvider,
-  useFormContext,
   type ControllerProps,
+  type ControllerFieldState,
   type FieldPath,
   type FieldValues,
 } from "react-hook-form";
@@ -17,6 +17,7 @@ type FormFieldContextValue<
   TName extends FieldPath<TFieldValues>,
 > = {
   name: TName;
+  error?: ControllerFieldState["error"];
 };
 
 const FormFieldContext = React.createContext<FormFieldContextValue<
@@ -31,25 +32,32 @@ const FormField = <
   ...props
 }: ControllerProps<TFieldValues, TName>) => {
   return (
-    <FormFieldContext.Provider value={{ name: props.name }}>
-      <Controller {...props} />
-    </FormFieldContext.Provider>
+    <Controller
+      {...props}
+      render={({ field, fieldState }) => (
+        <FormFieldContext.Provider
+          value={{
+            name: props.name,
+            error: fieldState.error,
+          }}
+        >
+          {props.render({ field, fieldState })}
+        </FormFieldContext.Provider>
+      )}
+    />
   );
 };
 
 const useFormField = () => {
   const fieldContext = React.useContext(FormFieldContext);
-  const { getFieldState, formState } = useFormContext();
 
   if (!fieldContext) {
     throw new Error("useFormField must be used within FormField");
   }
 
-  const fieldState = getFieldState(fieldContext.name, formState);
-
   return {
     name: fieldContext.name,
-    ...fieldState,
+    error: fieldContext.error,
   };
 };
 
@@ -69,6 +77,7 @@ const FormItem = React.forwardRef<
     </FormItemContext.Provider>
   );
 });
+
 FormItem.displayName = "FormItem";
 
 const FormLabel = React.forwardRef<
@@ -87,6 +96,7 @@ const FormLabel = React.forwardRef<
     />
   );
 });
+
 FormLabel.displayName = "FormLabel";
 
 const FormControl = ({ children }: { children: React.ReactElement }) => {
@@ -107,7 +117,7 @@ const FormMessage = React.forwardRef<
   const { error } = useFormField();
   const { id } = React.useContext(FormItemContext);
 
-  const body = error ? String(error.message) : children;
+  const body = error?.message || children;
 
   if (!body) return null;
 
@@ -122,6 +132,7 @@ const FormMessage = React.forwardRef<
     </p>
   );
 });
+
 FormMessage.displayName = "FormMessage";
 
 export { Form, FormControl, FormField, FormItem, FormLabel, FormMessage };
