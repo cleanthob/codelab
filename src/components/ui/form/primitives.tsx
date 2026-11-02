@@ -4,8 +4,8 @@ import * as React from "react";
 import {
   Controller,
   FormProvider,
-  type ControllerProps,
   type ControllerFieldState,
+  type ControllerProps,
   type FieldPath,
   type FieldValues,
 } from "react-hook-form";
@@ -32,16 +32,16 @@ const FormField = <
   ...props
 }: ControllerProps<TFieldValues, TName>) => {
   return (
-    <Controller
+    <Controller<TFieldValues, TName>
       {...props}
-      render={({ field, fieldState }) => (
+      render={({ field, fieldState, formState }) => (
         <FormFieldContext.Provider
           value={{
             name: props.name,
             error: fieldState.error,
           }}
         >
-          {props.render({ field, fieldState })}
+          {props.render({ field, fieldState, formState })}
         </FormFieldContext.Provider>
       )}
     />
@@ -99,7 +99,11 @@ const FormLabel = React.forwardRef<
 
 FormLabel.displayName = "FormLabel";
 
-const FormControl = ({ children }: { children: React.ReactElement }) => {
+type FormControlProps = {
+  children: React.ReactElement<Record<string, unknown>>;
+};
+
+const FormControl = ({ children }: FormControlProps) => {
   const { error } = useFormField();
   const { id } = React.useContext(FormItemContext);
 

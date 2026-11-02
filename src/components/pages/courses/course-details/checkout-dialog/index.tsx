@@ -45,6 +45,10 @@ export const CheckoutDialog = ({
     setStep(2);
   };
 
+  const handleBack = () => {
+    setStep(1);
+  };
+
   return (
     <Dialog
       open={open}
@@ -83,10 +87,12 @@ export const CheckoutDialog = ({
           )}
 
           {step === 2 && paymentMethod === "CREDIT_CARD" && (
-            <CreditCardForm onBack={() => setStep(1)} />
+            <CreditCardForm onBack={handleBack} />
           )}
 
-          {step === 2 && paymentMethod === "PIX" && <PixForm />}
+          {step === 2 && paymentMethod === "PIX" && (
+            <PixForm onBack={handleBack} />
+          )}
         </div>
       }
     />

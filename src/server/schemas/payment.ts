@@ -18,12 +18,16 @@ export const cpfSchema = z.string().refine((cpf: string) => {
   return rest(10) === cpfDigits[9] && rest(11) === cpfDigits[10];
 }, "Digite um CPF válido.");
 
-export const pixCheckoutSchema = z.object({
-  name: z.string().nonempty(),
-  postalCode: z.string().nonempty(),
-  addressNumber: z.string().nonempty(),
-  courseId: z.string().nonempty(),
+export const pixCheckoutFormSchema = z.object({
+  name: z.string().nonempty("Nome é obrigatório."),
+  postalCode: z.string().nonempty("CEP é obrigatório."),
+  addressNumber: z.string().nonempty("Número do endereço é obrigatório."),
+
   cpf: cpfSchema,
+});
+
+export const pixCheckoutSchema = pixCheckoutFormSchema.extend({
+  courseId: z.string().nonempty(),
 });
 
 export type PixCheckoutSchema = z.infer<typeof pixCheckoutSchema>;

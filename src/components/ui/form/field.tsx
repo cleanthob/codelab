@@ -1,12 +1,13 @@
 "use client";
 
-import { ReactNode } from "react";
+import { ReactElement } from "react";
 import {
   Control,
   ControllerFieldState,
   ControllerRenderProps,
+  FieldPath,
+  FieldValues,
 } from "react-hook-form";
-
 import { Input } from "../input";
 import {
   FormControl,
@@ -16,28 +17,27 @@ import {
   FormMessage,
 } from "./primitives";
 
-export type FormFieldProps = {
-  name: string;
+export type FormFieldProps<TFieldValues extends FieldValues> = {
+  name: FieldPath<TFieldValues>;
   label?: string;
   required?: boolean;
   className?: string;
-  control?: Control<any, any>;
+  control: Control<TFieldValues>;
   children?: (params: {
-    field: ControllerRenderProps<any, any>;
+    field: ControllerRenderProps<TFieldValues, FieldPath<TFieldValues>>;
     fieldState: ControllerFieldState;
-  }) => ReactNode;
+  }) => ReactElement;
 };
 
-export const FormField = ({
+export const FormField = <TFieldValues extends FieldValues>({
   name,
   label,
-  className,
   control,
   children,
   ...props
-}: FormFieldProps) => {
+}: FormFieldProps<TFieldValues>) => {
   return (
-    <FormFieldPrimitive
+    <FormFieldPrimitive<TFieldValues, FieldPath<TFieldValues>>
       control={control}
       name={name}
       render={({ field, fieldState }) => (
@@ -53,6 +53,6 @@ export const FormField = ({
           <FormMessage />
         </FormItem>
       )}
-    ></FormFieldPrimitive>
+    />
   );
 };
