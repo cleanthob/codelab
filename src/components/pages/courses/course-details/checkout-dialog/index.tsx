@@ -91,7 +91,7 @@ export const CheckoutDialog = ({
           )}
 
           {step === 2 && paymentMethod === "PIX" && (
-            <PixForm onBack={handleBack} />
+            <PixForm onBack={handleBack} course={course} />
           )}
         </div>
       }

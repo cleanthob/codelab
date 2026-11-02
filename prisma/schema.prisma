@@ -21,12 +21,14 @@ model User {
   email String @unique
   clerkUserId String @unique
   imageUrl String?
+  asaasId String?
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   
   completedLessons CompletedLesson[]
   lessonComments LessonComment[]
+  courses CoursePurchase[]
 
   @@map("users")
 }
@@ -75,6 +77,7 @@ model Course {
 
   modules CourseModule[]
   completedLessons CompletedLesson[]
+  purchases CoursePurchase[]
 
   @@map("courses")
 }
@@ -156,4 +159,19 @@ model LessonComment {
   updatedAt DateTime @updatedAt
 
   @@map("lesson_comments")
+}
+
+model CoursePurchase {
+  id String @id @default(cuid())
+  
+  courseId String
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("course_purchases")
 }
