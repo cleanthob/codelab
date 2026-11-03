@@ -1,3 +1,4 @@
+import { createCreditCardCheckout } from "@/actions/payment";
 import { Button } from "@/components/ui/button";
 import { FormField } from "@/components/ui/form/field";
 import { InputField } from "@/components/ui/form/input-field";
@@ -5,20 +6,36 @@ import { Form } from "@/components/ui/form/primitives";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import {
+  calculateInstallmentOptions,
+  formatPrice,
+  unMockValue,
+} from "@/lib/utils";
 import { creditCardCheckoutFormSchema } from "@/server/schemas/payment";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
+import axios from "axios";
 import { ArrowLeft, ArrowRight } from "lucide-react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { useRouter } from "next/navigation";
+import { useMemo } from "react";
 import Cards from "react-credit-cards-2";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { z } from "zod";
 
 type FormData = z.infer<typeof creditCardCheckoutFormSchema>;
 
 type CreditCardFormProps = {
   onBack: () => void;
+  onClose: () => void;
+  course: Course;
 };
 
-export const CreditCardForm = ({ onBack }: CreditCardFormProps) => {
+export const CreditCardForm = ({
+  onBack,
+  onClose,
+  course,
+}: CreditCardFormProps) => {
   const form = useForm<FormData>({
     resolver: zodResolver(creditCardCheckoutFormSchema),
     mode: "onSubmit",
@@ -36,18 +53,91 @@ export const CreditCardForm = ({ onBack }: CreditCardFormProps) => {
     },
   });
 
-  const { handleSubmit, watch } = form;
+  const { handleSubmit, watch, setError } = form;
 
+  const router = useRouter();
   const formValues = watch();
+  const rawCep = watch("postalCode");
 
-  const onSubmit = (data: FormData) => {
-    console.log(data);
+  const installmentsOptions = useMemo(() => {
+    return calculateInstallmentOptions(
+      course?.discountPrice ?? course.price,
+    ).map((option) => ({
+      label: `${option.installments}x ${formatPrice(option.installmentValue)}${option.hasInterest ? "" : "(sem juros)"}`,
+      value: String(option.installments),
+    }));
+  }, [course?.discountPrice, course.price]);
+
+  const { mutateAsync: validateCep, isPending: isValidatingCep } = useMutation({
+    mutationFn: async () => {
+      try {
+        const cep = unMockValue(rawCep);
+        const response = await axios.get(
+          `https://viacep.com.br/ws/${cep}/json`,
+        );
+
+        if (response.data.erro) {
+          setError("postalCode", { type: "manual", message: "CEP inválido" });
+          return false;
+        }
+
+        return true;
+      } catch {
+        setError("postalCode", {
+          type: "manual",
+          message: "Erro ao validar o CEP",
+        });
+      }
+    },
+  });
+
+  const { mutateAsync: handleCheckout, isPending: isLoading } = useMutation({
+    mutationFn: createCreditCardCheckout,
+    onSuccess: async () => {
+      toast.success("Pagamento confirmado! Você já pode acessar o curso.");
+      onClose();
+
+      toast.success(
+        "Agradecemos a sua compra! Você será redirecionado para o curso em instantes.",
+      );
+      await new Promise((resolve) => setTimeout(resolve, 4000));
+      router.push(`/courses/${course.slug}`);
+    },
+    onError: (error) => {
+      if (error?.message.includes("NOT_AUTHORIZED")) {
+        toast.error(
+          "Transação não autorizada. Verifique os dados do cartão de crédito.",
+        );
+        return;
+      }
+
+      if (error?.message.includes("CONFLICT")) {
+        toast.error("Você já possui acesso a este curso!");
+        onClose();
+        return;
+      }
+
+      toast.error(
+        "Ocorreu um erro ao processar o pagamento. Tente novamente ou entre em contato com o suporte.",
+      );
+    },
+  });
+
+  const onSubmit = async (data: FormData) => {
+    const isValidCep = await validateCep();
+
+    if (!isValidCep) return;
+
+    toast.promise(
+      handleCheckout({
+        ...data,
+        courseId: course.id,
+      }),
+      {
+        loading: "Processando pagamento...",
+      },
+    );
   };
-
-  const installmentsOptions = Array.from({ length: 12 }, (_, i) => ({
-    label: `${i + 1}x`,
-    value: `${i + 1}`,
-  }));
 
   return (
     <Form {...form}>
@@ -128,8 +218,8 @@ export const CreditCardForm = ({ onBack }: CreditCardFormProps) => {
             Voltar
           </Button>
 
-          <Button type="submit">
-            Continuar
+          <Button type="submit" disabled={isLoading || isValidatingCep}>
+            Confirmar
             <ArrowRight />
           </Button>
         </div>

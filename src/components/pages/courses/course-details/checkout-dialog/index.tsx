@@ -91,7 +91,11 @@ export const CheckoutDialog = ({
           )}
 
           {step === 2 && paymentMethod === "CREDIT_CARD" && (
-            <CreditCardForm onBack={handleBack} />
+            <CreditCardForm
+              onBack={handleBack}
+              course={course}
+              onClose={handleClose}
+            />
           )}
 
           {step === 2 && paymentMethod === "PIX" && (

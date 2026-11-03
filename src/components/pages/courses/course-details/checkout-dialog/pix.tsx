@@ -25,19 +25,13 @@ import { z } from "zod";
 
 type FormData = z.infer<typeof pixCheckoutFormSchema>;
 
-export type PixResponse = {
-  encodedImage: string;
-  payload: string;
-  expirationDate: string;
-};
-
 type PixFormProps = {
   onBack: () => void;
   onClose: () => void;
   course: Course;
 };
 
-export const PixForm = ({ onBack, course, onClose }: PixFormProps) => {
+export const PixForm = ({ onBack, onClose, course }: PixFormProps) => {
   const router = useRouter();
   const [step, setStep] = useState(1);
 
