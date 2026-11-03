@@ -7,6 +7,7 @@ import { formatName, unMockValue } from "@/lib/utils";
 import { ServerError } from "@/server/error";
 import { pixCheckoutSchema, PixCheckoutSchema } from "@/server/schemas/payment";
 import { getUser } from "./user";
+import { PixResponse } from "@/components/pages/courses/course-details/checkout-dialog/pix";
 
 type AsaasErrorResponse = {
   errors?: { code?: string; description?: string }[];
@@ -156,4 +157,24 @@ export const createPixCheckout = async (payload: PixCheckoutSchema) => {
       message: getAsaasErrorMessage(error, "/payments"),
     } satisfies PixCheckoutResult;
   }
+};
+
+export const getPixQrCode = async (invoiceId: string) => {
+  await getUser();
+
+  const { data } = await asaasApi.get<PixResponse>(
+    `/payments/${invoiceId}/pixQrCode`,
+  );
+
+  return data;
+};
+
+export const getInvoiceStatus = async (invoiceId: string) => {
+  await getUser();
+
+  const { data } = await asaasApi.get(`/payments/${invoiceId}`);
+
+  return {
+    status: data.status as string,
+  };
 };
