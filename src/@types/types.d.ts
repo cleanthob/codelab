@@ -23,3 +23,8 @@ type LessonCommentWithUserAndReplies = LessonComment & {
   user: User;
   replies?: LessonCommentWithUserAndReplies[];
 };
+
+type StatsChartData = {
+  date: Date;
+  count: number;
+};
