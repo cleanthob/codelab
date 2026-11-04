@@ -12,6 +12,7 @@ import Link from "next/link";
 import { CheckoutDialog } from "./checkout-dialog";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { getPurchasedCourses } from "@/actions/courses";
 
 type CourseProgressProps = {
   course: Course;
@@ -27,7 +28,14 @@ export const CourseProgress = ({ course }: CourseProgressProps) => {
     if (checkoutParam === "true") setShowCheckoutDialog(true);
   }, [checkoutParam]);
 
-  const hasCourse = false;
+  const { data: purchasedCourses } = useQuery({
+    queryKey: queryKeys.purchasedCourses,
+    queryFn: () => getPurchasedCourses(),
+  });
+
+  const hasCourse = purchasedCourses?.some(
+    (purchasedCourse) => purchasedCourse.id === course.id,
+  );
 
   const { data: courseProgress } = useQuery({
     queryKey: queryKeys.courseProgress(course.slug),

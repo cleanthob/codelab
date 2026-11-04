@@ -1,8 +1,9 @@
 import { getCourse } from "@/actions/courses";
+import { getPurchasedCourses } from "@/actions/courses";
 import { LessonDetails } from "@/components/pages/courses/course-page/lesson-details";
 import { ModulesList } from "@/components/pages/courses/course-page/modules-list";
 import { TopDetails } from "@/components/pages/courses/course-page/top-details";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 type CoursePageProps = {
   params: Promise<{ slug: string; moduleId: string; lessonId: string }>;
@@ -16,6 +17,12 @@ export default async function CoursePage({ params }: CoursePageProps) {
   const { course } = await getCourse(slug);
 
   if (!course) return notFound();
+  const purchasedCourses = await getPurchasedCourses();
+  const isPurchased = purchasedCourses.some(
+    (purchasedCourse) => purchasedCourse.id === course.id,
+  );
+
+  if (!isPurchased) return redirect(`/courses/details/${slug}`);
 
   const currentModule = course.modules.find((mod) => mod.id === moduleId);
 

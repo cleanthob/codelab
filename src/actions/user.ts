@@ -3,10 +3,16 @@
 import { prisma } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 
-export const getUser = async () => {
+export const getUser = async (throwError = true) => {
   const { userId } = await auth();
 
-  if (!userId) throw new Error("Unauthorized");
+  const emptyUser = { user: null, clerkUserId: null, userId: null };
+
+  if (!userId) {
+    if (!throwError) return emptyUser;
+
+    throw new Error("Unauthorized");
+  }
 
   const user = await prisma.user.findUnique({
     where: {
@@ -14,7 +20,11 @@ export const getUser = async () => {
     },
   });
 
-  if (!user) throw new Error("User not found");
+  if (!user) {
+    if (!throwError) return emptyUser;
+
+    throw new Error("User not found");
+  }
 
   return {
     user,
