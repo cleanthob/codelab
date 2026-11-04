@@ -3,10 +3,29 @@
 import { prisma } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 
-export const getUser = async (throwError = true) => {
+type FilledUser = {
+  user: NonNullable<Awaited<ReturnType<typeof prisma.user.findUnique>>>;
+  clerkUserId: string;
+  userId: string;
+};
+
+type EmptyUser = {
+  user: null;
+  clerkUserId: null;
+  userId: null;
+};
+
+export async function getUser(throwError?: true): Promise<FilledUser>;
+export async function getUser(
+  throwError: false,
+): Promise<FilledUser | EmptyUser>;
+
+export async function getUser(
+  throwError = true,
+): Promise<FilledUser | EmptyUser> {
   const { userId } = await auth();
 
-  const emptyUser = { user: null, clerkUserId: null, userId: null };
+  const emptyUser: EmptyUser = { user: null, clerkUserId: null, userId: null };
 
   if (!userId) {
     if (!throwError) return emptyUser;
@@ -31,4 +50,4 @@ export const getUser = async (throwError = true) => {
     clerkUserId: userId,
     userId: user.id,
   };
-};
+}
