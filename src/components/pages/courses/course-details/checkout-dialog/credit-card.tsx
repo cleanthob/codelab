@@ -104,14 +104,14 @@ export const CreditCardForm = ({
       router.push(`/courses/${course.slug}`);
     },
     onError: (error) => {
-      if (error?.message.includes("NOT_AUTHORIZED")) {
+      if (error?.name === "NOT_AUTHORIZED") {
         toast.error(
           "Transação não autorizada. Verifique os dados do cartão de crédito.",
         );
         return;
       }
 
-      if (error?.message.includes("CONFLICT")) {
+      if (error?.name === "CONFLICT") {
         toast.error("Você já possui acesso a este curso!");
         onClose();
         return;

@@ -107,13 +107,13 @@ export const PixForm = ({ onBack, onClose, course }: PixFormProps) => {
         handleGetQrCode(response.invoiceId);
       },
       onError: (error) => {
-        if (error?.message.includes("CONFLICT")) {
+        if (error?.name === "CONFLICT") {
           toast.error("Você já possui acesso a este curso!");
           onClose();
           return;
         }
+
         toast.error("Não foi possível gerar a cobrança. Tente novamente.");
-        onBack();
       },
     });
 

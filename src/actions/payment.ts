@@ -94,7 +94,7 @@ export const createPixCheckout = async (payload: PixCheckoutSchema) => {
 
   if (userHasCourse) {
     throw new ServerError({
-      message: "Você já possui este curso",
+      message: "Você já possui acesso a este curso",
       code: "CONFLICT",
     });
   }
@@ -263,7 +263,7 @@ export const createCreditCardCheckout = async (
   const price = course?.discountPrice ?? course?.price;
   const installmentsOptions = calculateInstallmentOptions(price);
   const installmentData = installmentsOptions.find(
-    (item) => (item.installments = installments),
+    (item) => item.installments === installments,
   );
 
   const installmentsTotal = installmentData?.total ?? price;
