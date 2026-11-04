@@ -16,6 +16,7 @@ import { pixCheckoutFormSchema } from "@/server/schemas/payment";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
+
 import { ArrowLeft, ArrowRight, Check, Copy } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -105,8 +106,14 @@ export const PixForm = ({ onBack, onClose, course }: PixFormProps) => {
         setInvoiceId(response.invoiceId);
         handleGetQrCode(response.invoiceId);
       },
-      onError: () => {
+      onError: (error) => {
+        if (error?.message.includes("CONFLICT")) {
+          toast.error("Você já possui acesso a este curso!");
+          onClose();
+          return;
+        }
         toast.error("Não foi possível gerar a cobrança. Tente novamente.");
+        onBack();
       },
     });
 
