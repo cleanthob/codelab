@@ -9,9 +9,7 @@ export default clerkMiddleware(async (auth, req) => {
     return;
   }
 
-  const { sessionClaims } = await auth();
-
-  if (!checkRole(sessionClaims, "admin")) {
+  if (!checkRole("admin")) {
     return NextResponse.redirect(new URL("/", req.url));
   }
 });

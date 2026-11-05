@@ -1,4 +1,4 @@
-import { CourseDifficulty } from "@/generated/prisma/enums";
+import { CourseDifficulty, CourseStatus } from "@/generated/prisma/enums";
 
 export { cn } from "cn";
 
@@ -40,6 +40,15 @@ export const formatName = (firstName: string, lastName?: string | null) => {
   if (!lastName) return firstName;
 
   return `${firstName} ${lastName}`;
+};
+
+export const formatStatus = (status: CourseStatus) => {
+  switch (status) {
+    case CourseStatus.DRAFT:
+      return "Rascunho";
+    case CourseStatus.PUBLISHED:
+      return "Publicado";
+  }
 };
 
 export const unMockValue = (value: string) => {
