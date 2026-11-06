@@ -2,20 +2,24 @@
 
 import { createCourseTag, getCoursesTags } from "@/actions/courses";
 import { BackButton } from "@/components/ui/back-button";
+import { Dropzone } from "@/components/ui/dropzone";
 import { FormField } from "@/components/ui/form/field";
 import { InputField } from "@/components/ui/form/input-field";
 
 import { Form } from "@/components/ui/form/primitives";
+import { SelectField } from "@/components/ui/form/select-field";
+
 import MultipleSelector, { Option } from "@/components/ui/multiple-selector";
 import { Separator } from "@/components/ui/separator";
 import { queryKeys } from "@/constants/query-keys";
+import { CourseDifficulty } from "@/generated/prisma/enums";
+import { formatDifficulty } from "@/lib/utils";
 import {
   CreateCourseFormData,
   createCourseSchema,
 } from "@/server/schemas/course";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { TrianglesCenterlineDashedHorizontal } from "lucide-react";
 import { useMemo } from "react";
 import { useForm } from "react-hook-form";
 
@@ -61,9 +65,24 @@ export const CourseForm = () => {
     }));
   }, [tagsData]);
 
+  const difficultyOptions = [
+    {
+      label: formatDifficulty(CourseDifficulty.EASY),
+      value: CourseDifficulty.EASY,
+    },
+    {
+      label: formatDifficulty(CourseDifficulty.MEDIUM),
+      value: CourseDifficulty.MEDIUM,
+    },
+    {
+      label: formatDifficulty(CourseDifficulty.HARD),
+      value: CourseDifficulty.HARD,
+    },
+  ];
+
   const selectedTags = useMemo(() => {
     return tagsOptions.filter((tag) => tagsIds.includes(tag.value));
-  }, []);
+  }, [tagsOptions, tagsIds]);
 
   const handleChangeTags = (value: Option[]) => {
     const tagToCreate = value.find(
@@ -123,7 +142,7 @@ export const CourseForm = () => {
             placeholder="89.99"
           />
           <FormField control={control} name="tagsIds" label="Tags">
-            {({ field }) => (
+            {() => (
               <MultipleSelector
                 options={tagsOptions}
                 placeholder="Selecione as tags"
@@ -132,6 +151,16 @@ export const CourseForm = () => {
                 value={selectedTags}
                 disabled={isAddingTag}
               />
+            )}
+          </FormField>
+          <SelectField
+            name="difficulty"
+            label="Dificuldade"
+            options={difficultyOptions}
+          />
+          <FormField name="thumbnail" className="col-span-full">
+            {({ field }) => (
+              <Dropzone file={field.value} setFile={field.onChange} />
             )}
           </FormField>
         </form>
