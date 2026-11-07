@@ -5,6 +5,7 @@ import { Form } from "@/components/ui/form/primitives";
 import { CreateCourseFormData } from "@/server/schemas/course";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createId } from "@paralleldrive/cuid2";
+import { useEffect } from "react";
 import { useForm, useFormContext } from "react-hook-form";
 import { z } from "zod";
 
@@ -15,16 +16,26 @@ const formSchema = z.object({
 
 type ModuleFormData = z.infer<typeof formSchema>;
 
+export type ModuleFormItem = ModuleFormData & { id: string };
+
 type ManageModuleDialogProps = {
   open: boolean;
   setOpen: (open: boolean) => void;
+  initialData?: ModuleFormItem | null;
+  setInitialData: (data: ModuleFormItem | null) => void;
 };
 
 export const ManageModuleDialog = ({
   open,
   setOpen,
+  initialData,
+  setInitialData,
 }: ManageModuleDialogProps) => {
-  const { getValues, setValue } = useFormContext<CreateCourseFormData>();
+  const {
+    getValues,
+    setValue,
+    reset: resetForm,
+  } = useFormContext<CreateCourseFormData>();
 
   const form = useForm<ModuleFormData>({
     resolver: zodResolver(formSchema),
@@ -34,12 +45,41 @@ export const ManageModuleDialog = ({
     },
   });
 
-  const { handleSubmit } = form;
+  const { handleSubmit, reset } = form;
+
+  const isEditing = !!initialData;
+
+  useEffect(() => {
+    if (open && initialData) {
+      reset(initialData);
+    }
+  }, [open, reset, setInitialData]);
+
+  useEffect(() => {
+    if (!open) {
+      reset({ title: "", description: "" });
+      setInitialData(null);
+    }
+  }, [open, reset, setInitialData]);
 
   const onSubmit = (data: ModuleFormData) => {
     const modules = getValues("modules");
 
-    // TODO: edit modules
+    if (isEditing) {
+      const updatedModules = modules.map((mod) => {
+        if (mod.id === initialData.id) {
+          return { ...mod, ...data };
+        }
+
+        return mod;
+      });
+
+      setValue("modules", updatedModules, { shouldValidate: true });
+      resetForm(getValues());
+
+      setOpen(false);
+      return;
+    }
 
     modules.push({
       ...data,
@@ -49,12 +89,14 @@ export const ManageModuleDialog = ({
     });
 
     setValue("modules", modules, { shouldValidate: true });
+    resetForm(getValues());
+
     setOpen(false);
   };
 
   return (
     <Dialog
-      title="Adicionar módulo"
+      title={isEditing ? "Editar módulo" : "Adicionar módulo"}
       open={open}
       setOpen={setOpen}
       width="500px"
@@ -73,7 +115,7 @@ export const ManageModuleDialog = ({
               className="max-w-max ml-auto"
               onClick={() => handleSubmit(onSubmit)()}
             >
-              Adicionar
+              {isEditing ? "Salvar" : "Adicionar"}
             </Button>
           </form>
         </Form>

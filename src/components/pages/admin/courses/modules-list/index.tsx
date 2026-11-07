@@ -3,16 +3,21 @@ import { CreateCourseFormData } from "@/server/schemas/course";
 import { GripVertical, Pen, Plus, Trash } from "lucide-react";
 import { useState } from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
-import { ManageModuleDialog } from "./manage-module-dialog";
+import { ManageModuleDialog, ModuleFormItem } from "./manage-module-dialog";
 import { Tooltip } from "@/components/ui/tooltip/";
 import { LessonsList } from "./lessons-list";
+import { ManageLessonDialog } from "./manage-lesson-dialog";
+import { AlertDialog } from "@/components/ui/alert-dialog";
 
 export const ModulesList = () => {
   const { control } = useFormContext<CreateCourseFormData>();
 
   const [showManageModuleDialog, setShowManageModuleDialog] = useState(false);
+  const [moduleToEdit, setModuleToEdit] = useState<ModuleFormItem | null>(null);
+  const [showManageLessonDialog, setShowManageLessonDialog] = useState(false);
+  const [moduleIndex, setModuleIndex] = useState(0);
 
-  const { fields } = useFieldArray({
+  const { fields, remove } = useFieldArray({
     control,
     name: "modules",
     keyName: "_id",
@@ -52,25 +57,44 @@ export const ModulesList = () => {
 
                 <div className="flex items-center gap-3">
                   <Tooltip content="Editar módulo">
-                    <Button variant="outline" size="icon">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => {
+                        setModuleToEdit(field);
+                        setShowManageModuleDialog(true);
+                      }}
+                    >
                       <Pen />
                     </Button>
                   </Tooltip>
 
                   <Tooltip content="Excluir módulo">
-                    <Button variant="outline" size="icon">
-                      <Trash />
-                    </Button>
+                    <AlertDialog
+                      title="Excluir módulo"
+                      description="Tem certeza que deseja excluir este módulo? Isso irá excluir todas as aulas deste módulo!"
+                      onConfirm={() => remove(index)}
+                    >
+                      <Button variant="outline" size="icon">
+                        <Trash />
+                      </Button>
+                    </AlertDialog>
                   </Tooltip>
 
-                  <Button variant="outline">
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setModuleIndex(index);
+                      setShowManageLessonDialog(true);
+                    }}
+                  >
                     Adicionar aula <Plus />
                   </Button>
                 </div>
               </div>
 
               {/* LessonsList  */}
-              <LessonsList />
+              <LessonsList moduleIndex={index} />
             </div>
           </div>
         ))}
@@ -79,6 +103,14 @@ export const ModulesList = () => {
       <ManageModuleDialog
         open={showManageModuleDialog}
         setOpen={setShowManageModuleDialog}
+        initialData={moduleToEdit}
+        setInitialData={setModuleToEdit}
+      />
+
+      <ManageLessonDialog
+        open={showManageLessonDialog}
+        setOpen={setShowManageLessonDialog}
+        moduleIndex={moduleIndex}
       />
     </div>
   );
