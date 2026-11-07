@@ -1,30 +1,21 @@
-"use client";
-
-import type { ComponentProps } from "react";
-import type { Control, FieldPath, FieldValues } from "react-hook-form";
-
-import { InputMask } from "@react-input/mask";
+import { ComponentProps } from "react";
 import { Input } from "../input";
 import { FormField } from "./field";
+import { InputMask } from "@react-input/mask";
 
-type InputFieldProps<T extends FieldValues> = Omit<
-  ComponentProps<typeof Input>,
-  "name"
-> & {
-  name: FieldPath<T>;
-  control: Control<T>;
-  mask?: string;
-};
+type InputFieldProps = ComponentProps<typeof FormField> &
+  ComponentProps<typeof Input> & {
+    mask?: string;
+  };
 
-export const InputField = <T extends FieldValues>({
+export const InputField = ({
   name,
   className,
   mask,
-  control,
   ...props
-}: InputFieldProps<T>) => {
+}: InputFieldProps) => {
   return (
-    <FormField<T> name={name} className={className} control={control}>
+    <FormField name={name} className={className} {...props}>
       {({ field }) =>
         mask ? (
           <InputMask

@@ -23,6 +23,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { useForm } from "react-hook-form";
+import { ModulesList } from "./modules-list";
 
 export const CourseForm = () => {
   const queryClient = useQueryClient();
@@ -41,7 +42,7 @@ export const CourseForm = () => {
     },
   });
 
-  const { handleSubmit, control, setValue, watch } = form;
+  const { handleSubmit, setValue, watch } = form;
 
   const { data: tagsData } = useQuery({
     queryKey: queryKeys.courseTags,
@@ -142,7 +143,7 @@ export const CourseForm = () => {
             label="Preço promocional (opcional)"
             placeholder="89.99"
           />
-          <FormField control={control} name="tagsIds" label="Tags">
+          <FormField name="tagsIds" label="Tags">
             {() => (
               <MultipleSelector
                 options={tagsOptions}
@@ -177,6 +178,10 @@ export const CourseForm = () => {
               <Editor value={field.value} onChange={field.onChange} />
             )}
           </FormField>
+
+          <Separator className="my-2 col-span-full" />
+
+          <ModulesList />
         </form>
       </Form>
     </>

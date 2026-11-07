@@ -1,47 +1,47 @@
 "use client";
 
-import { ReactElement } from "react";
+import { ReactNode } from "react";
 import {
   Control,
   ControllerFieldState,
   ControllerRenderProps,
-  FieldPath,
-  FieldValues,
 } from "react-hook-form";
-import { Input } from "../input";
+
 import {
-  FormControl,
   FormField as FormFieldPrimitive,
   FormItem,
   FormLabel,
+  FormControl,
   FormMessage,
 } from "./primitives";
+import { Input } from "../input";
 
-export type FormFieldProps<TFieldValues extends FieldValues> = {
-  name: FieldPath<TFieldValues>;
+export type FormFieldProps = {
+  name: string;
   label?: string;
   required?: boolean;
   className?: string;
-  control: Control<TFieldValues>;
+  control?: Control<any, any>;
   children?: (params: {
-    field: ControllerRenderProps<TFieldValues, FieldPath<TFieldValues>>;
+    field: ControllerRenderProps<any, any>;
     fieldState: ControllerFieldState;
-  }) => ReactElement;
+  }) => ReactNode;
 };
 
-export const FormField = <TFieldValues extends FieldValues>({
+export const FormField = ({
   name,
   label,
+  className,
   control,
   children,
   ...props
-}: FormFieldProps<TFieldValues>) => {
+}: FormFieldProps) => {
   return (
-    <FormFieldPrimitive<TFieldValues, FieldPath<TFieldValues>>
+    <FormFieldPrimitive
       control={control}
       name={name}
       render={({ field, fieldState }) => (
-        <FormItem>
+        <FormItem className={className}>
           {label && <FormLabel htmlFor={name}>{label}</FormLabel>}
           <FormControl>
             {children ? (
