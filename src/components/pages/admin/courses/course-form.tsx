@@ -24,6 +24,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { ModulesList } from "./modules-list";
+import { Button } from "@/components/ui/button";
 
 export const CourseForm = () => {
   const queryClient = useQueryClient();
@@ -96,7 +97,6 @@ export const CourseForm = () => {
       return;
     }
 
-    console.log(tagToCreate);
     setValue(
       "tagsIds",
       value.map((option) => option.value),
@@ -182,6 +182,10 @@ export const CourseForm = () => {
           <Separator className="my-2 col-span-full" />
 
           <ModulesList />
+
+          <div className="col-span-full flex justify-end">
+            <Button type="submit">Criar curso</Button>
+          </div>
         </form>
       </Form>
     </>
