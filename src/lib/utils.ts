@@ -83,3 +83,24 @@ export const calculateInstallmentOptions = (price: number) => {
 
   return installmentsOptions;
 };
+
+export const urlToFile = async (url: string): Promise<File> => {
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch file");
+  }
+
+  const blob = await response.blob();
+  const contentType =
+    response.headers.get("Content-Type") || "application/octet-stream";
+
+  const urlPath = url.split("/").pop() || "file";
+
+  const parts = urlPath.split("-");
+  const fileName = parts.length > 1 ? parts.slice(1).join("-") : urlPath;
+
+  console.log({ url, urlPath, parts, fileName });
+
+  return new File([blob], fileName, { type: contentType });
+};

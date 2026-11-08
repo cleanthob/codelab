@@ -36,3 +36,10 @@ export const createCourseSchema = courseSchema.extend({
 });
 
 export type CreateCourseFormData = z.infer<typeof createCourseSchema>;
+
+export const updateCourseSchema = courseSchema.extend({
+  id: z.string(),
+  thumbnail: z.instanceof(File).optional(),
+});
+
+export type UpdateCourseFormData = z.infer<typeof updateCourseSchema>;

@@ -9,6 +9,7 @@ import { formatPrice, formatStatus } from "@/lib/utils";
 import { ColumnDef } from "@tanstack/react-table";
 import { format } from "date-fns";
 import { Pencil, Send, Trash } from "lucide-react";
+import Link from "next/link";
 import { useMemo, useState } from "react";
 
 type CoursesTableProps = {
@@ -99,7 +100,9 @@ export const CoursesTables = ({ courses }: CoursesTableProps) => {
     {
       header: "",
       accessorKey: "actions",
-      cell: () => {
+      cell: ({ row }) => {
+        const course = row.original;
+
         return (
           <div className="flex items-center gap-2 justify-end">
             <Tooltip content="Alterar status para publicado">
@@ -108,9 +111,11 @@ export const CoursesTables = ({ courses }: CoursesTableProps) => {
               </Button>
             </Tooltip>
             <Tooltip content="Editar curso">
-              <Button variant="outline" size="icon">
-                <Pencil />
-              </Button>
+              <Link passHref href={`/admin/courses/edit/${course.id}`}>
+                <Button variant="outline" size="icon">
+                  <Pencil />
+                </Button>
+              </Link>
             </Tooltip>
             <Tooltip content="Excluir curso">
               <Button variant="outline" size="icon">
