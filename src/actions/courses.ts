@@ -9,6 +9,7 @@ import {
 } from "@/server/schemas/course";
 import slugify from "slugify";
 import { revalidatePath } from "next/cache";
+import { uploadImage } from "@/lib/upload";
 
 type GetCoursesPayload = {
   query?: string;
@@ -170,7 +171,7 @@ export const createCourse = async (rawData: CreateCourseFormData) => {
 
   const slug = slugCount > 0 ? `${rawSlug}-${slugCount + 1}` : rawSlug;
 
-  // TODO: upload thumbnail to cloudflare R2
+  const thumbnail = await uploadImage(data.thumbnail);
 
   const course = await prisma.course.create({
     data: {
@@ -182,7 +183,7 @@ export const createCourse = async (rawData: CreateCourseFormData) => {
       difficulty: data.difficult,
       slug,
       status: "DRAFT",
-      thumbnail: "",
+      thumbnail: thumbnail.secure_url,
       tags: {
         connect: data.tagsIds.map((id) => ({
           id,
