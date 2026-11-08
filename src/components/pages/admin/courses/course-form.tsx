@@ -1,6 +1,10 @@
 "use client";
 
-import { createCourseTag, getCoursesTags } from "@/actions/courses";
+import {
+  createCourse,
+  createCourseTag,
+  getCoursesTags,
+} from "@/actions/courses";
 import { BackButton } from "@/components/ui/back-button";
 import { Dropzone } from "@/components/ui/dropzone";
 import { Editor } from "@/components/ui/editor";
@@ -10,6 +14,7 @@ import { InputField } from "@/components/ui/form/input-field";
 import { Form } from "@/components/ui/form/primitives";
 import { SelectField } from "@/components/ui/form/select-field";
 
+import { Button } from "@/components/ui/button";
 import MultipleSelector, { Option } from "@/components/ui/multiple-selector";
 import { Separator } from "@/components/ui/separator";
 import { queryKeys } from "@/constants/query-keys";
@@ -24,10 +29,13 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { ModulesList } from "./modules-list";
-import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export const CourseForm = () => {
   const queryClient = useQueryClient();
+  const router = useRouter();
+
   const form = useForm<CreateCourseFormData>({
     resolver: zodResolver(createCourseSchema),
     defaultValues: {
@@ -60,6 +68,21 @@ export const CourseForm = () => {
       setValue("tagsIds", [...tagsIds, newTag.id], { shouldValidate: true });
     },
   });
+
+  const { mutate: handleCreateCourse, isPending: isCreatingCourse } =
+    useMutation({
+      mutationFn: createCourse,
+      onSuccess: () => {
+        toast.success("Curso criado com sucesso!");
+        router.push("/admin/courses");
+      },
+      onError: (error) => {
+        console.error(error);
+        toast.error(
+          "Ocorreu um erro ao criar o curso. Tente novamente mais tarde.",
+        );
+      },
+    });
 
   const tagsOptions = useMemo(() => {
     return (tagsData ?? []).map((tag) => ({
@@ -105,7 +128,19 @@ export const CourseForm = () => {
   };
 
   const onSubmit = (data: CreateCourseFormData) => {
-    console.log(data);
+    const dataWithOrder: CreateCourseFormData = {
+      ...data,
+      modules: data.modules.map((mod, index) => ({
+        ...mod,
+        order: index + 1,
+        lessons: mod.lessons.map((lesson, index) => ({
+          ...lesson,
+          order: index + 1,
+        })),
+      })),
+    };
+
+    handleCreateCourse(dataWithOrder);
   };
 
   return (
@@ -184,7 +219,9 @@ export const CourseForm = () => {
           <ModulesList />
 
           <div className="col-span-full flex justify-end">
-            <Button type="submit">Criar curso</Button>
+            <Button type="submit" disabled={isCreatingCourse}>
+              Criar curso
+            </Button>
           </div>
         </form>
       </Form>

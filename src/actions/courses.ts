@@ -3,6 +3,12 @@
 import { prisma } from "@/lib/prisma";
 import { getUser } from "./user";
 import { checkRole } from "@/lib/clerk";
+import {
+  CreateCourseFormData,
+  createCourseSchema,
+} from "@/server/schemas/course";
+import slugify from "slugify";
+import { revalidatePath } from "next/cache";
 
 type GetCoursesPayload = {
   query?: string;
@@ -140,4 +146,68 @@ export const createCourseTag = async (name: string) => {
   });
 
   return tag;
+};
+
+export const createCourse = async (rawData: CreateCourseFormData) => {
+  const isAdmin = await checkRole("admin");
+
+  if (!isAdmin) throw new Error("Unauthorized");
+
+  const data = createCourseSchema.parse(rawData);
+
+  const rawSlug = slugify(data.title, {
+    lower: true,
+    strict: true,
+  });
+
+  const slugCount = await prisma.course.count({
+    where: {
+      slug: {
+        startsWith: rawSlug,
+      },
+    },
+  });
+
+  const slug = slugCount > 0 ? `${rawSlug}-${slugCount + 1}` : rawSlug;
+
+  // TODO: upload thumbnail to cloudflare R2
+
+  const course = await prisma.course.create({
+    data: {
+      title: data.title,
+      shortDescription: data.shortDescription,
+      description: data.description,
+      price: data.price,
+      discountPrice: data.discountPrice,
+      difficulty: data.difficult,
+      slug,
+      status: "DRAFT",
+      thumbnail: "",
+      tags: {
+        connect: data.tagsIds.map((id) => ({
+          id,
+        })),
+      },
+      modules: {
+        create: data.modules.map((mod) => ({
+          title: mod.title,
+          description: mod.description,
+          order: mod.order,
+          lessons: {
+            create: mod.lessons.map((lesson) => ({
+              title: lesson.title,
+              description: lesson.description,
+              videoId: lesson.videoId,
+              durationInMs: lesson.durationInMs,
+              order: lesson.order,
+            })),
+          },
+        })),
+      },
+    },
+  });
+
+  revalidatePath("/admin/courses");
+
+  return course;
 };
