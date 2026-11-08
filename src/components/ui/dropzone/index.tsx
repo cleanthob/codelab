@@ -1,3 +1,5 @@
+"use client";
+
 import {
   FileList,
   FileListAction,
@@ -21,6 +23,7 @@ import {
   DropzoneUploadIcon,
   DropzoneZone,
 } from "./components";
+import { useState } from "react";
 
 type DropzoneProps = {
   file?: File;
@@ -37,11 +40,23 @@ export const Dropzone = ({
   setFile,
   accept = defaultAccept,
 }: DropzoneProps) => {
+  const [error, setError] = useState("");
+
   return (
     <DropzoneRoot
       accept={accept}
       maxSize={5 * 1024 * 1024} // 5MB
-      onDropAccepted={(files) => setFile(files[0])}
+      onDropAccepted={(files) => {
+        setError("");
+        setFile(files[0]);
+      }}
+      onDropRejected={(files) => {
+        const rejection = files[0]?.errors[0];
+
+        if (rejection?.code === "file-too-large") {
+          setError("A imagem é maior que 5MB.");
+        }
+      }}
     >
       <div className="flex flex-col gap-4">
         <DropzoneZone>
@@ -53,6 +68,7 @@ export const Dropzone = ({
                 Arraste e solte ou clique para fazer upload
               </DropzoneTitle>
               <DropzoneDescription>Máximo de 5MB</DropzoneDescription>
+              {error && <p className="text-sm text-destructive">{error}</p>}
             </DropzoneGroup>
           </DropzoneGroup>
         </DropzoneZone>

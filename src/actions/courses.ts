@@ -1,15 +1,15 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
-import { getUser } from "./user";
+import { uploadImage } from "@/actions/upload";
 import { checkRole } from "@/lib/clerk";
+import { prisma } from "@/lib/prisma";
 import {
   CreateCourseFormData,
   createCourseSchema,
 } from "@/server/schemas/course";
-import slugify from "slugify";
 import { revalidatePath } from "next/cache";
-import { uploadImage } from "@/lib/upload";
+import slugify from "slugify";
+import { getUser } from "./user";
 
 type GetCoursesPayload = {
   query?: string;
