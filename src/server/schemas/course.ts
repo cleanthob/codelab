@@ -10,7 +10,7 @@ const courseLessonSchema = z.object({
   order: z.number().min(1, "Campo obrigatório"),
 });
 
-const courseModuleSchema = z.object({
+export const courseModuleSchema = z.object({
   id: z.string(),
   title: z.string().nonempty("Campo obrigatório"),
   description: z.string().nonempty("Campo obrigatório"),

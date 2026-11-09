@@ -2,9 +2,14 @@
 
 import {
   createCourse,
+  createCourseModules,
   createCourseTag,
+  deleteCourseLessons,
+  deleteCourseModules,
   getCoursesTags,
+  revalidateCourseDetails,
   updateCourse,
+  updateCourseModules,
 } from "@/actions/courses";
 import { BackButton } from "@/components/ui/back-button";
 import { Dropzone } from "@/components/ui/dropzone";
@@ -27,6 +32,7 @@ import {
 } from "@/server/schemas/course";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { dequal } from "dequal";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -115,9 +121,60 @@ export const CourseForm = ({ initialData }: CourseFormProps) => {
           ...data,
           thumbnail: dirtyFields.thumbnail ? data.thumbnail : undefined,
         });
+
+        const isModuleUpdated = !dequal(initialData.modules, data.modules);
+
+        if (!isModuleUpdated) {
+          await revalidateCourseDetails(courseId);
+          return;
+        }
+
+        const removedModules = initialData.modules.filter(
+          (mod) => !data.modules.find((m) => m.id === mod.id),
+        );
+        const allLessons = data.modules.flatMap((mod) => mod.lessons);
+        const allInitialLessons = initialData.modules.flatMap(
+          (mod) => mod.lessons,
+        );
+
+        const removedLessons = allInitialLessons.filter(
+          (lesson) => !allLessons.find((l) => l.id === lesson.id),
+        );
+
+        const modulesToCreate = data.modules.filter(
+          (mod) => !initialData.modules.find((m) => m.id === mod.id),
+        );
+        const modulesToUpdate = data.modules.filter(
+          (mod) =>
+            !removedModules.find((m) => m.id === mod.id) &&
+            !modulesToCreate.find((l) => l.id === mod.id),
+        );
+
+        if (!!removedLessons.length)
+          await deleteCourseLessons(removedLessons.map((lesson) => lesson.id));
+
+        if (!!removedModules.length)
+          await deleteCourseModules(removedModules.map((mod) => mod.id));
+
+        if (!!modulesToCreate.length)
+          await createCourseModules(courseId, modulesToCreate);
+
+        if (!!modulesToUpdate.length) {
+          await updateCourseModules(modulesToUpdate);
+        }
+
+        await revalidateCourseDetails(courseId);
       },
-      onSuccess: () => {},
-      onError: () => {},
+      onSuccess: () => {
+        toast.success("Curso atualizado com sucesso!");
+        router.push("/admin/courses");
+      },
+      onError: (error) => {
+        console.error(error);
+        toast.error(
+          "Ocorreu um erro ao atualizar o curso. Tente novamente mais tarde.",
+        );
+      },
     });
 
   const { mutate: handleCreateCourse, isPending: isCreatingCourse } =

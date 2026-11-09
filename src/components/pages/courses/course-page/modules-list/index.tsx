@@ -55,8 +55,6 @@ export const ModulesList = ({ modules }: ModulesListProps) => {
 
   const completedLessons = courseProgress?.completedLessons ?? [];
 
-  console.log(completedLessons);
-
   return (
     <aside
       className={cn(

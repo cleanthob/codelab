@@ -100,7 +100,5 @@ export const urlToFile = async (url: string): Promise<File> => {
   const parts = urlPath.split("-");
   const fileName = parts.length > 1 ? parts.slice(1).join("-") : urlPath;
 
-  console.log({ url, urlPath, parts, fileName });
-
   return new File([blob], fileName, { type: contentType });
 };

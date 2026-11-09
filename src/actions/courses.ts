@@ -8,15 +8,19 @@ import {
 import { checkRole } from "@/lib/clerk";
 import { prisma } from "@/lib/prisma";
 import {
+  courseModuleSchema,
   CreateCourseFormData,
+  CreateCourseModulePayload,
   createCourseSchema,
   UpdateCourseFormData,
   updateCourseSchema,
 } from "@/server/schemas/course";
 import { revalidatePath } from "next/cache";
 import slugify from "slugify";
+import { z } from "zod";
 import { getUser } from "./user";
-import { startsWith } from "zod";
+import { LessonsList } from "@/components/pages/admin/courses/modules-list/lessons-list";
+import { ModelName } from "@/generated/prisma/internal/prismaNamespace";
 
 type GetCoursesPayload = {
   query?: string;
@@ -285,4 +289,127 @@ export const updateCourse = async (rawData: UpdateCourseFormData) => {
   revalidatePath("/admin/courses");
 
   return updateCourse;
+};
+
+export const deleteCourseLessons = async (lessonIds: string[]) => {
+  const isAdmin = await checkRole("admin");
+
+  if (!isAdmin) throw new Error("Unathorized");
+
+  await prisma.courseLesson.deleteMany({
+    where: { id: { in: lessonIds } },
+  });
+};
+
+export const deleteCourseModules = async (moduleIds: string[]) => {
+  const isAdmin = await checkRole("admin");
+
+  if (!isAdmin) throw new Error("Unathorized");
+
+  await prisma.courseModule.deleteMany({
+    where: { id: { in: moduleIds } },
+  });
+};
+
+export const createCourseModules = async (
+  courseId: string,
+  modules: CreateCourseModulePayload[],
+) => {
+  const isAdmin = await checkRole("admin");
+
+  if (!isAdmin) throw new Error("Unauthorized");
+
+  const schema = z.array(courseModuleSchema);
+
+  const data = schema.parse(modules);
+
+  const courseModules = await Promise.all(
+    data.map((mod) =>
+      prisma.courseModule.create({
+        data: {
+          title: mod.title,
+          description: mod.description,
+          order: mod.order,
+          courseId,
+          lessons: {
+            createMany: {
+              data: mod.lessons.map((lesson) => ({
+                title: lesson.title,
+                description: lesson.description,
+                durationInMs: lesson.durationInMs,
+                order: lesson.order,
+                videoId: lesson.videoId,
+              })),
+            },
+          },
+        },
+      }),
+    ),
+  );
+
+  return courseModules;
+};
+
+export const updateCourseModules = async (
+  modules: CreateCourseModulePayload[],
+) => {
+  const isAdmin = await checkRole("admin");
+
+  if (!isAdmin) throw new Error("Unauthorized");
+
+  const schema = z.array(courseModuleSchema);
+  const data = schema.parse(modules);
+
+  await Promise.all(
+    data.map(async (mod) => {
+      await prisma.courseModule.update({
+        where: { id: mod.id },
+        data: {
+          title: mod.title,
+          description: mod.description,
+          order: mod.order,
+        },
+      });
+
+      await Promise.all(
+        mod.lessons.map((lesson) =>
+          prisma.courseLesson.upsert({
+            where: {
+              id: lesson.id,
+            },
+            update: {
+              order: lesson.order,
+              title: lesson.title,
+              description: lesson.description,
+              videoId: lesson.videoId,
+              durationInMs: lesson.durationInMs,
+              moduleId: mod.id,
+            },
+            create: {
+              order: lesson.order,
+              title: lesson.title,
+              description: lesson.description,
+              videoId: lesson.videoId,
+              durationInMs: lesson.durationInMs,
+              moduleId: mod.id,
+            },
+          }),
+        ),
+      );
+    }),
+  );
+};
+
+export const revalidateCourseDetails = async (courseId: string) => {
+  const isAdmin = await checkRole("admin");
+
+  if (!isAdmin) throw new Error("Unathorized");
+
+  const course = await prisma.course.findUnique({
+    where: { id: courseId },
+  });
+
+  if (!course) throw new Error("Course not found");
+
+  revalidatePath(`/courses/details/${course.slug}`);
 };
