@@ -76,7 +76,7 @@ export const deleteComment = async (commentId: string) => {
   const { sessionClaims } = await auth();
   const { userId } = await getUser();
 
-  const isAdmin = checkRole(sessionClaims, "admin");
+  const isAdmin = checkRole("admin");
 
   const comment = await prisma.lessonComment.findUnique({
     where: { id: commentId },
@@ -93,4 +93,37 @@ export const deleteComment = async (commentId: string) => {
   await prisma.lessonComment.delete({
     where: { id: commentId },
   });
+};
+
+export const getAdminComments = async (): Promise<AdminComment[]> => {
+  const isAdmin = await checkRole("admin");
+
+  if (!isAdmin) throw new Error("Unauthorized");
+
+  const comments = await prisma.lessonComment.findMany({
+    where: {
+      parentId: null,
+    },
+    include: {
+      user: true,
+      lesson: {
+        include: {
+          module: {
+            include: { course: true },
+          },
+        },
+      },
+      _count: {
+        select: { replies: true },
+      },
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  return comments.map(({ _count, ...comment }) => ({
+    ...comment,
+    repliesCount: _count.replies,
+  }));
 };
