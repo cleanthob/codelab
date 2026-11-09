@@ -435,3 +435,26 @@ export const updateCourseStatus = async ({
 
   return course;
 };
+
+export const deleteCourse = async (courseId: string) => {
+  const isAdmin = await checkRole("admin");
+
+  if (!isAdmin) throw new Error("Unauthorized");
+
+  const course = await prisma.course.findUnique({
+    where: { id: courseId },
+  });
+
+  if (!course) throw new Error("Course not found");
+
+  await prisma.course.delete({
+    where: { id: courseId },
+  });
+
+  const publicId = await getCloudinaryPublicId(course.thumbnail);
+
+  await deleteImage(publicId);
+
+  revalidatePath("/");
+  revalidatePath("/admin/courses");
+};

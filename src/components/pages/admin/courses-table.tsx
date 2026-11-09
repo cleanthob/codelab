@@ -1,12 +1,14 @@
 "use client";
 
-import { updateCourseStatus } from "@/actions/courses";
+import { deleteCourse, updateCourseStatus } from "@/actions/courses";
+import { AlertDialog } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/ui/data-table";
 import { Input } from "@/components/ui/input";
 import { Tooltip } from "@/components/ui/tooltip/index";
 import { formatPrice, formatStatus } from "@/lib/utils";
+
 import { useMutation } from "@tanstack/react-query";
 import { ColumnDef } from "@tanstack/react-table";
 import { format } from "date-fns";
@@ -21,6 +23,13 @@ type CoursesTableProps = {
 
 export const CoursesTables = ({ courses }: CoursesTableProps) => {
   const [search, setSearch] = useState("");
+
+  const { mutateAsync: handleDeleteCourse, isPending: isDeletingCourse } =
+    useMutation({
+      mutationFn: deleteCourse,
+      onSuccess: () => toast.success("Curso deletado com sucesso!"),
+      onError: () => toast.error("Erro ao deletar curso!"),
+    });
 
   const { mutate: handleUpdateCourseStatus, isPending: isUpdatingStatus } =
     useMutation({
@@ -147,9 +156,19 @@ export const CoursesTables = ({ courses }: CoursesTableProps) => {
               </Link>
             </Tooltip>
             <Tooltip content="Excluir curso">
-              <Button variant="outline" size="icon">
-                <Trash />
-              </Button>
+              <AlertDialog
+                title="Excluir curso"
+                description="Tem certeza que deseja excluir este curso? Essa ação não pode ser revertida."
+                onConfirm={() => handleDeleteCourse(course.id)}
+              >
+                <Button
+                  variant="outline"
+                  size="icon"
+                  disabled={isDeletingCourse}
+                >
+                  <Trash />
+                </Button>
+              </AlertDialog>
             </Tooltip>
           </div>
         );
