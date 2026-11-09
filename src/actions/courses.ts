@@ -5,6 +5,7 @@ import {
   getCloudinaryPublicId,
   uploadImage,
 } from "@/actions/upload";
+import { CourseStatus } from "@/generated/prisma/enums";
 import { checkRole } from "@/lib/clerk";
 import { prisma } from "@/lib/prisma";
 import {
@@ -19,9 +20,6 @@ import { revalidatePath } from "next/cache";
 import slugify from "slugify";
 import { z } from "zod";
 import { getUser } from "./user";
-import { LessonsList } from "@/components/pages/admin/courses/modules-list/lessons-list";
-import { ModelName } from "@/generated/prisma/internal/prismaNamespace";
-import { CourseStatus } from "@/generated/prisma/enums";
 
 type GetCoursesPayload = {
   query?: string;
@@ -195,7 +193,7 @@ export const createCourse = async (rawData: CreateCourseFormData) => {
       difficulty: data.difficult,
       slug,
       status: "DRAFT",
-      thumbnail: thumbnail.secure_url,
+      thumbnail: thumbnail.url,
       tags: {
         connect: data.tagsIds.map((id) => ({
           id,
