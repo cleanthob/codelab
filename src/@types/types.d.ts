@@ -5,6 +5,7 @@ type CourseLesson = import("@/generated/prisma/client").CourseLesson;
 type CompletedLesson = import("@/generated/prisma/client").CompletedLesson;
 type LessonComment = import("@/generated/prisma/client").LessonComment;
 type User = import("@/generated/prisma/client").User;
+type PlatformNotification = import("@/generated/prisma/client").Notification;
 
 type CourseWithTagsAndModules = Course & {
   tags: CourseTag[];

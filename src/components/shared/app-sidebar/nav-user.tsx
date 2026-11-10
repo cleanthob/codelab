@@ -22,9 +22,12 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useClerk, useUser } from "@clerk/nextjs";
 import { BadgeCheck, ChevronsUpDown, LogIn, LogOut } from "lucide-react";
 import Link from "next/link";
+import { NotificationsPopover } from "./notifications-popover";
+import { cn } from "cn";
 
 export const NavUser = () => {
   const { user, isLoaded } = useUser();
+  const { open } = useSidebar();
 
   const { openUserProfile, signOut } = useClerk();
 
@@ -32,35 +35,21 @@ export const NavUser = () => {
     <SidebarMenu>
       <SidebarMenuItem>
         {user ? (
-          <DropdownMenu>
-            <DropdownMenuTrigger
-              render={
-                <SidebarMenuButton
-                  size="lg"
-                  className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-                >
-                  <Avatar src={user.imageUrl} fallback={user.fullName} />
-                  <div className="grid flex-1 text-left text-sm leadin-tight">
-                    <span className="truncate font-semibold">
-                      {user.fullName}
-                    </span>
-                    <span className="truncate text-xs">
-                      {user.primaryEmailAddress?.emailAddress}
-                    </span>
-                  </div>
-                  <ChevronsUpDown className="ml-auto size-4" />
-                </SidebarMenuButton>
-              }
-            ></DropdownMenuTrigger>
-            <DropdownMenuContent
-              className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
-              sideOffset={4}
-            >
-              <DropdownMenuGroup>
-                <DropdownMenuLabel className="p-0 font-normal">
-                  <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+          <div
+            className={cn(
+              "flex w-full items-center gap-2",
+              open ? "flex-col-reverse items-stretch" : "flex-col items-center",
+            )}
+          >
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                render={
+                  <SidebarMenuButton
+                    size="lg"
+                    className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                  >
                     <Avatar src={user.imageUrl} fallback={user.fullName} />
-                    <div className="grid flex-1 text-left text-sm leading-tight">
+                    <div className="grid flex-1 text-left text-sm leadin-tight">
                       <span className="truncate font-semibold">
                         {user.fullName}
                       </span>
@@ -68,25 +57,48 @@ export const NavUser = () => {
                         {user.primaryEmailAddress?.emailAddress}
                       </span>
                     </div>
-                  </div>
-                </DropdownMenuLabel>
+                    <ChevronsUpDown className="ml-auto size-4" />
+                  </SidebarMenuButton>
+                }
+              ></DropdownMenuTrigger>
+              <DropdownMenuContent
+                className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
+                sideOffset={4}
+              >
+                <DropdownMenuGroup>
+                  <DropdownMenuLabel className="p-0 font-normal">
+                    <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+                      <Avatar src={user.imageUrl} fallback={user.fullName} />
+                      <div className="grid flex-1 text-left text-sm leading-tight">
+                        <span className="truncate font-semibold">
+                          {user.fullName}
+                        </span>
+                        <span className="truncate text-xs">
+                          {user.primaryEmailAddress?.emailAddress}
+                        </span>
+                      </div>
+                    </div>
+                  </DropdownMenuLabel>
 
-                <DropdownMenuSeparator />
+                  <DropdownMenuSeparator />
 
-                <DropdownMenuItem onClick={() => openUserProfile()}>
-                  <BadgeCheck />
-                  Gerenciar conta
-                </DropdownMenuItem>
-              </DropdownMenuGroup>
-              <Separator />
-              <DropdownMenuGroup>
-                <DropdownMenuItem onClick={() => signOut()}>
-                  <LogOut />
-                  Sair
-                </DropdownMenuItem>
-              </DropdownMenuGroup>
-            </DropdownMenuContent>
-          </DropdownMenu>
+                  <DropdownMenuItem onClick={() => openUserProfile()}>
+                    <BadgeCheck />
+                    Gerenciar conta
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
+                <Separator />
+                <DropdownMenuGroup>
+                  <DropdownMenuItem onClick={() => signOut()}>
+                    <LogOut />
+                    Sair
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <NotificationsPopover />
+          </div>
         ) : (
           <>
             {!isLoaded ? (
