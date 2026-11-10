@@ -2,6 +2,7 @@
 
 import { Avatar } from "@/components/ui/avatar";
 import { DataTable } from "@/components/ui/data-table";
+import { DataTableFeatures } from "@/components/ui/data-table/data-table-features";
 import { ColumnDef, rowAggregationFeature } from "@tanstack/react-table";
 import { cn } from "cn";
 
@@ -10,7 +11,7 @@ type RankingTableProps = {
 };
 
 export const RankingTable = ({ ranking }: RankingTableProps) => {
-  const columns: ColumnDef<RankingUser>[] = [
+  const columns: ColumnDef<DataTableFeatures, RankingUser>[] = [
     {
       header: "Posição",
       accessorKey: "position",

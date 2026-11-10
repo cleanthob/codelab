@@ -1,41 +1,43 @@
 "use client";
 
-import { ReactNode } from "react";
+import { ReactElement } from "react";
 import {
   Control,
   ControllerFieldState,
   ControllerRenderProps,
+  FieldPath,
+  FieldValues,
 } from "react-hook-form";
 
+import { Input } from "../input";
 import {
+  FormControl,
   FormField as FormFieldPrimitive,
   FormItem,
   FormLabel,
-  FormControl,
   FormMessage,
 } from "./primitives";
-import { Input } from "../input";
 
-export type FormFieldProps = {
-  name: string;
+export type FormFieldProps<T extends FieldValues> = {
+  name: FieldPath<T>;
   label?: string;
   required?: boolean;
   className?: string;
-  control?: Control<any, any>;
+  control?: Control<T>;
   children?: (params: {
-    field: ControllerRenderProps<any, any>;
+    field: ControllerRenderProps<T, FieldPath<T>>;
     fieldState: ControllerFieldState;
-  }) => ReactNode;
+  }) => ReactElement;
 };
 
-export const FormField = ({
+export const FormField = <T extends FieldValues>({
   name,
   label,
   className,
   control,
   children,
   ...props
-}: FormFieldProps) => {
+}: FormFieldProps<T>) => {
   return (
     <FormFieldPrimitive
       control={control}

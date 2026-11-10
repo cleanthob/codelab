@@ -1,9 +1,10 @@
 import { prisma } from "@/lib/prisma";
 import type { UserJSON, WebhookEvent } from "@clerk/nextjs/server";
 import { verifyWebhook } from "@clerk/nextjs/webhooks";
-import { NextResponse } from "next/server";
 
-export async function POST(req: Request) {
+import { NextRequest, NextResponse } from "next/server";
+
+export async function POST(req: NextRequest) {
   let evt: WebhookEvent;
 
   // 1. Verificar a assinatura do webhook.

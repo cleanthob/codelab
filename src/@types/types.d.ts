@@ -16,6 +16,10 @@ type CourseModuleWithLessons = CourseModule & {
   lessons: CourseLesson[];
 };
 
+type LessonWithProgress = CourseLesson & {
+  completed: boolean;
+};
+
 type CourseWithModulesAndLessons = Course & {
   modules: CourseModuleWithLessons[];
 };

@@ -21,7 +21,7 @@ type CourseDetailsPageProps = {
   params: Promise<{ slug: string }>;
 };
 
-export const instant = false;
+// export const instant = false;
 
 export default async function CourseDetailPage({
   params,

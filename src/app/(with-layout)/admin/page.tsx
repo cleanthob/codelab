@@ -3,6 +3,8 @@ import { StatsCharts } from "@/components/pages/admin/stats-charts";
 import { connection } from "next/server";
 import { Suspense } from "react";
 
+export const dynamic = "force-dynamic";
+
 export default function AdminPage() {
   return (
     <Suspense fallback={<p>Carregando estatísticas...</p>}>

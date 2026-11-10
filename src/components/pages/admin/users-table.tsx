@@ -9,6 +9,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { format } from "date-fns";
 import { useMemo, useState } from "react";
 import { SendNotificationDialog } from "./send-notification-dialog";
+import { DataTableFeatures } from "@/components/ui/data-table/data-table-features";
 
 type UsersTableProps = {
   users: AdminUser[];
@@ -31,7 +32,7 @@ export const UsersTable = ({ users }: UsersTableProps) => {
     });
   }, [search, users]);
 
-  const columns: ColumnDef<AdminUser>[] = [
+  const columns: ColumnDef<DataTableFeatures, AdminUser>[] = [
     {
       header: "Nome",
       accessorKey: "firstName",

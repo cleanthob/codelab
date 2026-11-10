@@ -26,7 +26,7 @@ const courseSchema = z.object({
   price: z.coerce.number().min(1, "Campo obrigatório"),
   discountPrice: z.coerce.number().optional(),
   description: z.string().nonempty("Campo obrigatório"),
-  difficult: z.nativeEnum(CourseDifficulty, "Campo obrigatório"),
+  difficulty: z.nativeEnum(CourseDifficulty, "Campo obrigatório"),
   tagsIds: z.array(z.string()).min(1, "Selecione pelo menos uma tag"),
   thumbnail: z.instanceof(File, { message: "Campo obrigatório" }),
 });
@@ -35,7 +35,8 @@ export const createCourseSchema = courseSchema.extend({
   modules: z.array(courseModuleSchema).min(1, "Adicione pelo menos um módulo"),
 });
 
-export type CreateCourseFormData = z.infer<typeof createCourseSchema>;
+export type CreateCourseFormInput = z.input<typeof createCourseSchema>;
+export type CreateCourseFormData = z.output<typeof createCourseSchema>;
 
 export const updateCourseSchema = courseSchema.extend({
   id: z.string(),

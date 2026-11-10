@@ -18,7 +18,8 @@ const formSchema = z.object({
   durationInMs: z.coerce.number().min(1, "Campo obrigatório"),
 });
 
-type LessonFormData = z.infer<typeof formSchema>;
+type LessonFormInput = z.input<typeof formSchema>;
+type LessonFormData = z.output<typeof formSchema>;
 
 export type LessonFormItem = LessonFormData & { id: string };
 
@@ -43,7 +44,7 @@ export const ManageLessonDialog = ({
     reset: resetForm,
   } = useFormContext<CreateCourseFormData>();
 
-  const form = useForm<LessonFormData>({
+  const form = useForm<LessonFormInput, any, LessonFormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: "",

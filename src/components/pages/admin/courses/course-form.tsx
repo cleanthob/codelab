@@ -28,6 +28,7 @@ import { CourseDifficulty } from "@/generated/prisma/enums";
 import { formatDifficulty, urlToFile } from "@/lib/utils";
 import {
   CreateCourseFormData,
+  CreateCourseFormInput,
   createCourseSchema,
 } from "@/server/schemas/course";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -57,15 +58,15 @@ export const CourseForm = ({ initialData }: CourseFormProps) => {
   const isEditing = !!initialData;
   const [initialDataIsSet, setInitialDataIsSet] = useState(false);
 
-  const form = useForm<CreateCourseFormData>({
+  const form = useForm<CreateCourseFormInput, any, CreateCourseFormData>({
     resolver: zodResolver(createCourseSchema),
     defaultValues: {
       title: "",
       shortDescription: "",
       price: 0,
-      discountPrice: "" as unknown as number,
+      discountPrice: undefined,
       description: "",
-      difficult: "EASY",
+      difficulty: "EASY",
       thumbnail: undefined,
       tagsIds: [],
       modules: [],

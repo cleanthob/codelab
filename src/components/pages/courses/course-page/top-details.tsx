@@ -3,17 +3,15 @@
 import { BackButton } from "@/components/ui/back-button";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { Tooltip } from "@/components/ui/tooltip";
-import { Course } from "@/generated/prisma/client";
+import { Tooltip } from "@/components/ui/tooltip/index";
 import { usePreferencesStore } from "@/stores/preferences";
 import { PanelRightOpen } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 
 type TopDetailsProps = {
-  course: CourseModuleWithLessons;
+  course: CourseWithModulesAndLessons;
 };
-
 export const TopDetails = ({ course }: TopDetailsProps) => {
   const params = useParams();
   const { autoplay, setAutoplay, setModulesListCollapsed } =

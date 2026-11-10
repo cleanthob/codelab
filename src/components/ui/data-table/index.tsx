@@ -12,13 +12,13 @@ import {
 } from "@/components/ui/table";
 
 import {
+  DataTableFeatures,
   features,
-  type DataTableFeatures,
 } from "@/components/ui/data-table/data-table-features";
 import { DataTablePagination } from "./pagination";
 
 interface DataTableProps<TData extends RowData> {
-  columns: ColumnDef<DataTableFeatures, TData>[];
+  columns: ColumnDef<DataTableFeatures, TData, unknown>[];
   data: TData[];
   pagination?: boolean;
 }

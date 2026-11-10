@@ -26,7 +26,14 @@ export const Select = ({
   className,
 }: SelectProps) => {
   return (
-    <SelectRoot value={value} onValueChange={onChange}>
+    <SelectRoot
+      value={value}
+      onValueChange={(value) => {
+        if (value !== null) {
+          onChange(value);
+        }
+      }}
+    >
       <SelectTrigger className={cn("w-full", className)}>
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>

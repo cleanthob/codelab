@@ -1,13 +1,13 @@
-import { ReactNode } from "react";
+import { ReactElement } from "react";
 import {
-  Tooltip as TooltipRoot,
-  TooltipProvider,
-  TooltipTrigger,
   TooltipContent,
+  TooltipProvider,
+  Tooltip as TooltipRoot,
+  TooltipTrigger,
 } from "./primitives";
 
 type TooltipProps = {
-  children: ReactNode;
+  children: ReactElement;
   content: string;
 };
 

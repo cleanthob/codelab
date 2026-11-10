@@ -5,6 +5,7 @@ import { AlertDialog } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/ui/data-table";
+import { DataTableFeatures } from "@/components/ui/data-table/data-table-features";
 import { Input } from "@/components/ui/input";
 import { Tooltip } from "@/components/ui/tooltip/index";
 import { formatPrice, formatStatus } from "@/lib/utils";
@@ -42,7 +43,7 @@ export const CoursesTables = ({ courses }: CoursesTableProps) => {
       },
     });
 
-  const columns: ColumnDef<CourseWithTagsAndModules, unknown>[] = [
+  const columns: ColumnDef<DataTableFeatures, CourseWithTagsAndModules>[] = [
     { header: "Título", accessorKey: "title" },
     {
       header: "Tags",

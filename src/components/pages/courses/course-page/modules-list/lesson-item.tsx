@@ -2,7 +2,7 @@ import {
   markLessonsAsCompleted,
   unkmarkLessonAsCompleted,
 } from "@/actions/course-progress";
-import { Tooltip } from "@/components/ui/tooltip";
+import { Tooltip } from "@/components/ui/tooltip/index";
 import { useRouter } from "next/navigation";
 import { queryKeys } from "@/constants/query-keys";
 import { formatDuration } from "@/lib/utils";

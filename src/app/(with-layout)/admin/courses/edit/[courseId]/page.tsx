@@ -1,6 +1,5 @@
 import { getCourse } from "@/actions/courses";
 import { CourseForm } from "@/components/pages/admin/courses/course-form";
-import { ModelName } from "@/generated/prisma/internal/prismaNamespace";
 import { notFound } from "next/navigation";
 
 type EditCoursePageProps = {
@@ -22,7 +21,7 @@ export default async function EditCoursePage({ params }: EditCoursePageProps) {
         price: course.price ?? 0,
         discountPrice: course.discountPrice ?? undefined,
         description: course.description,
-        difficult: course.difficulty,
+        difficulty: course.difficulty,
         thumbnailUrl: course.thumbnail,
         tagsIds: course.tags.map((tag) => tag.id),
         modules: course.modules.map((mod) => ({

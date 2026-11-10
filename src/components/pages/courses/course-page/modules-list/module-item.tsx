@@ -21,8 +21,8 @@ export const ModuleItem = ({ data, completedLessons }: ModuleItemProps) => {
 
   const formattedDuration = formatDuration(totalDuration);
 
-  const lessons = useMemo(() => {
-    return data.lessons.map((lesson: CourseLesson) => ({
+  const lessons = useMemo<LessonWithProgress[]>(() => {
+    return data.lessons.map((lesson) => ({
       ...lesson,
       completed: completedLessons.some((item) => item.lessonId === lesson.id),
     }));
@@ -30,7 +30,7 @@ export const ModuleItem = ({ data, completedLessons }: ModuleItemProps) => {
 
   const moduleProgress = useMemo(() => {
     const completedModuleLessons = lessons.filter(
-      (lesson: CourseLesson) => lesson.completed,
+      (lesson) => lesson.completed,
     ).length;
 
     return (completedModuleLessons / totalLessons) * 100;
@@ -70,7 +70,7 @@ export const ModuleItem = ({ data, completedLessons }: ModuleItemProps) => {
       </Accordion.Trigger>
       <Accordion.Content className="data-[state=closed]:animate-slideUp data-[state=open]:animate-slideDown overflow-hidden">
         <div className="p-2 flex flex-col">
-          {lessons.map((lesson: CourseLesson) => (
+          {lessons.map((lesson) => (
             <LessonItem key={lesson.id} lesson={lesson} />
           ))}
         </div>

@@ -1,19 +1,19 @@
 "use client";
 
+import { deleteComment } from "@/actions/course-comments";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Tooltip } from "@/components/ui/tooltip";
+import { Tooltip } from "@/components/ui/tooltip/index";
+import { queryKeys } from "@/constants/query-keys";
 import { formatName } from "@/lib/utils";
+import { useUser } from "@clerk/nextjs";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { cn } from "cn";
 import { formatDistanceToNow } from "date-fns";
 import { MessageSquareQuote, Trash } from "lucide-react";
 import { useState } from "react";
-import { CommentInput } from "./comment-input";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { deleteComment } from "@/actions/course-comments";
-import { queryKeys } from "@/constants/query-keys";
 import { toast } from "sonner";
-import { useUser } from "@clerk/nextjs";
+import { CommentInput } from "./comment-input";
 
 type CommentItemProps = {
   comment: LessonCommentWithUserAndReplies;
