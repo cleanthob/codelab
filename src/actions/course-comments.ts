@@ -4,6 +4,7 @@ import { checkRole } from "@/lib/clerk";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { getUser } from "./user";
+import { formatName } from "@/lib/utils";
 
 type CreateLessonCommentPayload = {
   courseSlug: string;
@@ -30,7 +31,7 @@ export const createLessonComment = async ({
   lessonId,
   parentId,
 }: CreateLessonCommentPayload) => {
-  const { userId } = await getUser();
+  const { userId, user } = await getUser();
 
   if (content.length > 500) {
     throw new Error("Comentário deve ter no máximo 500 caracteres");
@@ -69,11 +70,29 @@ export const createLessonComment = async ({
     data: { content, lessonId, userId, parentId: parentId ?? null },
   });
 
+  if (parentId) {
+    const parentComment = await prisma.lessonComment.findUnique({
+      where: { id: parentId },
+    });
+
+    const parentUserId = parentComment?.userId;
+
+    if (parentUserId && parentUserId !== userId) {
+      await prisma.notification.create({
+        data: {
+          userId: parentUserId,
+          title: "Nova resposta ao seu comentário",
+          content: `${formatName(user.firstName, user.lastName)} respondeu ao seu comentário no curso "${course.title}"`,
+          link: `/courses/${courseSlug}/${lesson.moduleId}/lesson/${lessonId}`,
+        },
+      });
+    }
+  }
+
   return comment;
 };
 
 export const deleteComment = async (commentId: string) => {
-  const { sessionClaims } = await auth();
   const { userId } = await getUser();
 
   const isAdmin = checkRole("admin");
