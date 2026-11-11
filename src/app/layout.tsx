@@ -15,7 +15,13 @@ setDefaultOptions({ locale: dateFnsPtBR });
 const nunito = Nunito({ subsets: ["latin"], variable: "--font-sans" });
 
 export const metadata: Metadata = {
-  title: "Codelab",
+  title: {
+    template: "%s | CodeLab",
+    default: "Codelab",
+  },
+  icons: {
+    icon: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

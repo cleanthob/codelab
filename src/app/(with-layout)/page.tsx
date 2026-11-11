@@ -1,6 +1,7 @@
 import { CoursesList } from "@/components/pages/courses/courses-list";
 import { CourseTagsList } from "@/components/pages/courses/tags-list";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Metadata } from "next";
 import { Suspense } from "react";
 
 type CoursesPageProps = {
@@ -8,6 +9,11 @@ type CoursesPageProps = {
     query: string;
     tags: string | string[];
   }>;
+};
+
+export const metadata: Metadata = {
+  title: "Cursos",
+  description: "Comece hoje mesmo a aprender a programar com nossos cursos.",
 };
 
 export default async function CoursesPage({ searchParams }: CoursesPageProps) {

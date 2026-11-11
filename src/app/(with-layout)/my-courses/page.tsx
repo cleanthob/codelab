@@ -1,5 +1,10 @@
 import { getPurchasedCoursesWithDetails } from "@/actions/courses";
 import { CourseItem } from "@/components/pages/courses/courses-list/course-item";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Meus cursos",
+};
 
 export default async function PurchasedCoursesPage() {
   const courses = await getPurchasedCoursesWithDetails();

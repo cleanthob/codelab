@@ -1,8 +1,13 @@
 import { getRanking } from "@/actions/ranking";
 import { RankingTable } from "@/components/pages/ranking/ranking-table";
 import { Crown } from "lucide-react";
+import { Metadata } from "next";
 
 export const revalidate = 3600; // Revalidate at most every hour
+
+export const metadata: Metadata = {
+  title: "Ranking",
+};
 
 export default async function RankingPage() {
   const ranking = await getRanking();

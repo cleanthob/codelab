@@ -4,6 +4,7 @@ import { BackButton } from "@/components/ui/back-button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { prisma } from "@/lib/prisma";
 import { cn, formatDifficulty, formatDuration } from "@/lib/utils";
 import { format } from "date-fns";
 import {
@@ -14,12 +15,43 @@ import {
   Clock,
   LayoutDashboard,
 } from "lucide-react";
+import { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 
 type CourseDetailsPageProps = {
   params: Promise<{ slug: string }>;
 };
+
+export async function generateMetadata({
+  params,
+}: CourseDetailsPageProps): Promise<Metadata> {
+  const { slug } = await params;
+
+  const { course } = await getCourse(slug);
+
+  if (!course) return { title: "Curso não encontrado" };
+
+  return {
+    title: course.title,
+    description: course.shortDescription,
+    openGraph: {
+      images: [course.thumbnail],
+    },
+  };
+}
+
+export async function generateStaticParams() {
+  const courses = await prisma.course.findMany({
+    select: {
+      slug: true,
+    },
+  });
+
+  return courses.map((course) => ({
+    slug: course.slug,
+  }));
+}
 
 // export const instant = false;
 
