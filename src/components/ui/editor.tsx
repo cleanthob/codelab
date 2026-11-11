@@ -11,6 +11,7 @@ import { StrikeThroughToolbar } from "@/components/toolbars/strikethrough";
 import { ToolbarProvider } from "@/components/toolbars/toolbar-provider";
 import { EditorContent, type Extension, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+import { cn } from "cn";
 
 const extensions = [
   StarterKit.configure({
@@ -41,6 +42,32 @@ const extensions = [
 type EditorProps = {
   value: string;
   onChange: (value: string) => void;
+};
+
+type EditorPreviewProps = {
+  value: string;
+  className?: string;
+};
+
+export const EditorPreview = ({ value, className }: EditorPreviewProps) => {
+  const editor = useEditor({
+    extensions: extensions as Extension[],
+    content: value,
+    immediatelyRender: false,
+    editable: false,
+  });
+
+  if (!editor) {
+    return null;
+  }
+
+  return (
+    <EditorContent
+      className={cn("outline-none cursor-default editor-preview", className)}
+      editor={editor}
+      readOnly
+    />
+  );
 };
 
 export const Editor = ({ value, onChange }: EditorProps) => {
